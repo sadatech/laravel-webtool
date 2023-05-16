@@ -23,7 +23,7 @@ class WebtoolServiceProvider extends ServiceProvider
      */
     protected function basepath($location)
     {
-        return realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.$location);
+        return realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.$location);
     }
 
     /**
@@ -41,7 +41,7 @@ class WebtoolServiceProvider extends ServiceProvider
         }
         else
         {
-            $this->loadViewsFrom($this->basepath('resources/views'), $this->namespace);
+            $this->loadViewsFrom($this->basepath('/dist/resources/views'), $this->namespace);
 
             $this->webtoolMapRoutes();
         }
@@ -71,6 +71,6 @@ class WebtoolServiceProvider extends ServiceProvider
              ->middleware('web')
              ->namespace($this->namespace)
              ->as('webtool.')
-             ->group($this->basepath('/Routes/route.php'));
+             ->group($this->basepath('/dist/routes/route.php'));
     }
 }
