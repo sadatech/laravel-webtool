@@ -13,7 +13,15 @@ class WebtoolServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    protected $namespace = 'App\Http\Controllers';
+    protected $namespace = 'Sadatech\Webtool\Http\Controllers';
+
+    /**
+     * 
+     */
+    protected function basepath($location)
+    {
+        return realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.$location);
+    }
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -23,6 +31,33 @@ class WebtoolServiceProvider extends ServiceProvider
     public function boot()
     {
         // parent::boot();
+
+        $this->webtoolMapRoutes();
     }
-    
+
+    /**
+     * Define the routes for the application.
+     *
+     * @return void
+     */
+    public function map()
+    {
+        //
+    }
+
+    /**
+     * Define the "webtool" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function webtoolMapRoutes()
+    {
+        Route::prefix('webtool')
+             ->middleware('web')
+             ->namespace($this->namespace)
+             ->as('webtool.')
+             ->group($this->basepath('/Routes/webtool.php'));
+    }
 }
