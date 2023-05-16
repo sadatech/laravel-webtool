@@ -30,7 +30,7 @@
         $(document).ready(function(){
             $.ajax({
                 url: "{{ route('webtool.live-sync.action') }}",
-                async: true,
+                async: false,
                 success: (function(return_msg){
                     $("#webtool-return-sync").append(return_msg)
                 })

@@ -21,6 +21,7 @@ class WebtoolController extends Controller
         if (file_exists($command[0]))
         {
             $process = new Process($command, null, [
+                'SYNC_USE_WEBUI' => 'yes',
                 'SYNC_FORCE_FETCH' => 'yes',
             ]);
             $process->run();
