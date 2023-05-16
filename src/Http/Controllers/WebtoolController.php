@@ -14,11 +14,11 @@ class WebtoolController extends Controller
 
     public function index(Request $request)
     {
-        return view('webtool::welcome');
+        return view(\Sadatech\Webtool\Application::LARAVEL_WEBTOOL_NAMESPACE . '::welcome');
     }
 
     public function liveSync(Request $request)
     {
-        return view('webtool::live_sync');
+        return view(\Sadatech\Webtool\Application::LARAVEL_WEBTOOL_NAMESPACE . '::live_sync');
     }
 }

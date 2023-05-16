@@ -16,7 +16,7 @@ class WebtoolServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    protected $namespace = 'Sadatech\Webtool\Http\Controllers';
+    protected $namespace = \Sadatech\Webtool\Application::LARAVEL_WEBTOOL_NAMESPACE;
 
     /**
      * 
@@ -41,7 +41,7 @@ class WebtoolServiceProvider extends ServiceProvider
         }
         else
         {
-            $this->loadViewsFrom($this->basepath('resources/views'), 'webtool');
+            $this->loadViewsFrom($this->basepath('resources/views'), $this->namespace);
 
             $this->webtoolMapRoutes();
         }
