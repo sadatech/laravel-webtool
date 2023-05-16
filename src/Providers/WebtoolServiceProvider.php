@@ -53,9 +53,7 @@ class WebtoolServiceProvider extends ServiceProvider
      */
     protected function webtoolMapConsole()
     {
-        // $this->commands([
-            
-        // ]);
+        $this->commands($this->commands);
     }
 
     /**

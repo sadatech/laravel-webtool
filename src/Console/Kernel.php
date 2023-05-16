@@ -1,12 +1,9 @@
 <?php
 namespace Sadatech\Webtool\Console;
 
-use App\Console\Commands\DuplicateAttendanceData;
-use App\Console\Commands\GeneratePlanToMasuk;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
-class Kernel extends ConsoleKernel
+trait Kernel
 {
     /**
      * The Artisan commands provided by your application.
