@@ -30,9 +30,13 @@
         $(document).ready(function(){
             $.ajax({
                 url: "{{ route('webtool.live-sync.action') }}",
-                async: false,
+                async: true,
+                beforeSend: (function(){
+                    $("#webtool-return-sync").html("Waiting response from backend server...");
+                }),
                 success: (function(return_msg){
-                    $("#webtool-return-sync").append(return_msg)
+                    $("#webtool-return-sync").html("");
+                    $("#webtool-return-sync").append(return_msg);
                 })
             });
         });
