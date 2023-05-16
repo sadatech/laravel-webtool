@@ -44,8 +44,8 @@ class WebtoolController extends Controller
 
     public function liveSyncAction()
     {
-        $process = self::__webtool_com(['/usr/local/bin/webtool', 'app', 'sync', request()->getHost()]);
+        $process = self::__webtool_com(['SYNC_FORCE_FETCH=yes /usr/local/bin/webtool', 'app', 'sync', request()->getHost()]);
 
-        return "<style>code{color:white;}</style><pre><code>".$process."</code></pre>";
+        return "<style>code{color:white;}</style><pre><code>".strip_tags($process)."</code></pre>";
     }
 }
