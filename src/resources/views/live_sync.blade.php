@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laravel Webtool - Live Sync</title>
+    <link rel="shortcut icon" href="https://cdn.sadata.id/logo-sadata.png" />
     <style>
         body {
             margin: 0;
@@ -20,8 +21,19 @@
     </style>
 </head>
 <body>
-    <iframe src="{{ route('webtool.live-sync.action') }}" style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">
-        Your browser doesn't support iframes
-    </iframe>
+    <div id="webtool-return-sync"></div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $.ajax({
+                url: "{{ route('webtool.live-sync.action') }}",
+                async: true,
+                success: (function(return_msg){
+                    $("#webtool-return-sync").append(return_msg)
+                })
+            });
+        });
+    </script>
 </body>
 </html>
