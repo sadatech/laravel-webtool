@@ -1,5 +1,5 @@
 <?php
-namespace Sadatech\Webtool\Commands;
+namespace Sadatech\Webtool\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use App\JobTrace;
 use App\Helper\ConfigHelper;
 
-class Webtool extends Command
+class Console extends Command
 {
     /**
      * The name and signature of the console command.

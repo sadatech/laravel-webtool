@@ -51,7 +51,7 @@ class WebtoolServiceProvider extends ServiceProvider
     protected function webtoolMapConsole()
     {
         $this->commands([
-            \Sadatech\Webtool\Commands\Webtool::class,
+            \Sadatech\Webtool\Console\Commands\Console::class,
         ]);
     }
 
@@ -68,6 +68,6 @@ class WebtoolServiceProvider extends ServiceProvider
              ->middleware('web')
              ->namespace($this->namespace)
              ->as('webtool.')
-             ->group($this->basepath('/Routes/webtool.php'));
+             ->group($this->basepath('/Routes/route.php'));
     }
 }
