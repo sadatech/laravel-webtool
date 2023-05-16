@@ -3,12 +3,7 @@
     "description": "Laravel helper Webtool commands",
     "license": "MIT",
     "type": "library",
-    "require": {
-        "guzzlehttp/guzzle": "^7.4",
-        "league/flysystem-aws-s3-v3": "~1.0",
-        "league/flysystem": "1.1",
-        "league/flysystem-cached-adapter": "~1.0"
-    },
+    "require": {},
     "autoload": {
         "psr-4": {
             "Sadatech\\Webtool\\": "src/"
