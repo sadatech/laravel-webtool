@@ -14,6 +14,6 @@
             "Sadatech\\Webtool\\": "src/"
         }
     },
-    "minimum-stability": "master",
+    "minimum-stability": "beta",
     "prefer-stable": true
 }
