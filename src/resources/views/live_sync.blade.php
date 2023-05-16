@@ -9,6 +9,8 @@
     <style>
         body {
             margin: 0;
+            background-color:black;
+            color:white;
         }
 
         iframe {
