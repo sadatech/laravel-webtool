@@ -46,6 +46,6 @@ class WebtoolController extends Controller
     {
         $process = self::__webtool_com(['/usr/local/bin/webtool', 'app', 'sync', request()->getHost()]);
 
-        return "<style>code{color:white;}</style><code>".$process."</code>";
+        return "<style>code{color:white;}</style><pre><code>".$process."</code></pre>";
     }
 }
