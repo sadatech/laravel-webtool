@@ -3,7 +3,9 @@
     "description": "Laravel helper Webtool commands",
     "license": "MIT",
     "type": "library",
-    "require": {},
+    "require": {
+        "laravelcollective/remote": "^v5.4"
+    },
     "autoload": {
         "psr-4": {
             "Sadatech\\Webtool\\": "src/"

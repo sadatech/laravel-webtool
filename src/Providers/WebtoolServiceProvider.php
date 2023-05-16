@@ -32,17 +32,27 @@ class WebtoolServiceProvider extends ServiceProvider
     {
         // parent::boot();
 
-        $this->webtoolMapRoutes();
+        if ($this->app->runningInConsole())
+        {
+            $this->webtoolMapConsole();
+        }
+        else
+        {
+            $this->webtoolMapRoutes();
+        }
+
     }
 
     /**
-     * Define the routes for the application.
+     * Define the console for the application.
      *
      * @return void
      */
-    public function map()
+    protected function webtoolMapConsole()
     {
-        //
+        $this->commands([
+            Sadatech\Webtool\Commands\Webtool::class,
+        ]);
     }
 
     /**
