@@ -34,7 +34,7 @@
 
                 <div class="mt-8 overflow-hidden">
                     <div class="ml-4 text-center text-sm text-gray-500 sm:text-center sm:ml-0">
-                        Webtool {{ \Sadatech\Webtool\Application::LARAVEL_WEBTOOL_VERSION }} (PHP v{{ PHP_VERSION }})
+                        WEBTOOL {{ \Sadatech\Webtool\Application::LARAVEL_WEBTOOL_VERSION }} (PHP v{{ PHP_VERSION }})
                     </div>
                 </div>
             </div>

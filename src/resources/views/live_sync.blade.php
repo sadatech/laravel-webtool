@@ -31,6 +31,9 @@
             $.ajax({
                 url: "{{ route('webtool.live-sync.action') }}",
                 async: true,
+                type: "POST",
+                contentType: false,
+                processData: false,
                 beforeSend: (function(){
                     $("#webtool-return-sync").html("Waiting response from backend server...");
                 }),
