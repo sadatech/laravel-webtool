@@ -14,11 +14,11 @@ class WebtoolController extends Controller
 
     public function index(Request $request)
     {
-        return response()->json(["webtool_connector" => "0.1-beta"]);
+        return view('welcome');
     }
 
     public function liveSync(Request $request)
     {
-        return response()->json(["webtool_connector" => "live-sync"]);
+        return view('live_sync');
     }
 }
