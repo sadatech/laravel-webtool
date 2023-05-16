@@ -29,8 +29,7 @@
     <script type="text/javascript">
         $(document).ready(function(){
             $.ajax({
-                url: "{{ route('webtool.live-sync.action') }}",
-                data: {"_token":"{{ csrf_token() }}"},
+                url: "{{ route('webtool.live-sync.action') }}?_token={{ csrf_token() }}",
                 async: true,
                 type: "POST",
                 contentType: false,
