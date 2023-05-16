@@ -20,7 +20,9 @@ class WebtoolController extends Controller
     {
         if (file_exists($command[0]))
         {
-            $process = new Process($command);
+            $process = new Process($command, null, [
+                'SYNC_FORCE_FETCH' => 'yes',
+            ]);
             $process->run();
 
             if (!$process->isSuccessful())
@@ -44,7 +46,7 @@ class WebtoolController extends Controller
 
     public function liveSyncAction()
     {
-        $process = self::__webtool_com(['SYNC_FORCE_FETCH=yes /usr/local/bin/webtool', 'app', 'sync', request()->getHost()]);
+        $process = self::__webtool_com(['/usr/local/bin/webtool', 'app', 'sync', request()->getHost()]);
 
         return "<style>code{color:white;}</style><pre><code>".strip_tags($process)."</code></pre>";
     }
