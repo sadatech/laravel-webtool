@@ -10,3 +10,5 @@
 */
 
 Route::get('/', 'WebtoolController@index')->name('index');
+
+Route::get('/live/sync', 'WebtoolController@liveSync')->name('live-sync');

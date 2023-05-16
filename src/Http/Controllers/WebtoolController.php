@@ -16,4 +16,9 @@ class WebtoolController extends Controller
     {
         return response()->json(["webtool_connector" => "0.1-beta"]);
     }
+
+    public function liveSync(Request $request)
+    {
+        return response()->json(["webtool_connector" => "live-sync"]);
+    }
 }
