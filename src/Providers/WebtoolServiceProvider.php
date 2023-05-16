@@ -3,9 +3,12 @@ namespace Sadatech\Webtool\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Sadatech\Webtool\Console\Kernel as WebtoolConsoleKernel;
 
 class WebtoolServiceProvider extends ServiceProvider
 {
+    use WebtoolConsoleKernel;
+
     /**
      * This namespace is applied to your controller routes.
      *
@@ -50,9 +53,9 @@ class WebtoolServiceProvider extends ServiceProvider
      */
     protected function webtoolMapConsole()
     {
-        $this->commands([
-            \Sadatech\Webtool\Console\Commands\Console::class,
-        ]);
+        // $this->commands([
+            
+        // ]);
     }
 
     /**
