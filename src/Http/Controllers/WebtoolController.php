@@ -4,6 +4,7 @@ namespace Sadatech\Webtool\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Sadatech\Webtool\Helpers\Webtool as WebtoolHelper;
+use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 
 class WebtoolController extends Controller
