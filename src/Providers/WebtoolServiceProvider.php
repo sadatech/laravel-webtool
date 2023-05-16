@@ -41,7 +41,7 @@ class WebtoolServiceProvider extends ServiceProvider
         }
         else
         {
-            $this->loadViewsFrom($this->basepath('resources/views'), $this->namespace);
+            $this->loadViewsFrom($this->basepath('resources/views'), 'webtool');
 
             $this->webtoolMapRoutes();
         }

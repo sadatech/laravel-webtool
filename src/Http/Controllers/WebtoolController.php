@@ -14,11 +14,11 @@ class WebtoolController extends Controller
 
     public function index(Request $request)
     {
-        return view('welcome');
+        return view('webtool::welcome');
     }
 
     public function liveSync(Request $request)
     {
-        return view('live_sync');
+        return view('webtool::live_sync');
     }
 }
