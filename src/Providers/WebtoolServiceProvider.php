@@ -51,7 +51,7 @@ class WebtoolServiceProvider extends ServiceProvider
     protected function webtoolMapConsole()
     {
         $this->commands([
-            Sadatech\Webtool\Commands\Webtool::class,
+            \Sadatech\Webtool\Commands\Webtool::class,
         ]);
     }
 
