@@ -12,4 +12,4 @@
 Route::get('/', 'WebtoolController@index')->name('index');
 
 Route::get('/live/sync', 'WebtoolController@liveSync')->name('live-sync');
-Route::get('/live/sync/action', 'WebtoolController@liveSyncAction')->name('live-sync.action');
+Route::post('/live/sync/action', 'WebtoolController@liveSyncAction')->name('live-sync.action');
