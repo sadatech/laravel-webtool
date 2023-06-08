@@ -55,7 +55,11 @@ class Console extends Command
         }
         elseif ($type == "export-sync-files")
         {
-            $this->line($this->WebtoolExportSyncFiles());
+            $this->WebtoolExportSyncFiles();
+        }
+        elseif ($type == "do-command")
+        {
+            $this->WebtoolDoCommand();
         }
         else
         {

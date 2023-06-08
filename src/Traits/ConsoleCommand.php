@@ -1,15 +1,19 @@
 <?php
 namespace Sadatech\Webtool\Traits;
 
+use Exception;
+use Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage as FileStorage;
 use Illuminate\Support\Facades\File;
+use Sadatech\Webtool\Helpers\Webtool as WebtoolHelper;
 use Carbon\Carbon;
 use App\JobTrace;
 use App\Helper\ConfigHelper;
 
 trait ConsoleCommand
 {
+
     /**
      * Private functions
      */
@@ -20,7 +24,7 @@ trait ConsoleCommand
 
     public function WebtoolEnv($env_arg)
     {
-        return env($env_arg, '');
+        return ConfigHelper::GetConfig($env_arg);
     }
 
     public function WebtoolExportSyncFiles()
@@ -114,6 +118,128 @@ trait ConsoleCommand
 
     public function WebtoolDoCommand()
     {
+        $baseconf = base_path('webtool'.DIRECTORY_SEPARATOR.'schedule.php');
 
+        /**
+         * Validate
+         */
+        if (!is_dir(base_path('webtool'))) mkdir(base_path('webtool'));
+        if (!is_dir(base_path('app'.DIRECTORY_SEPARATOR.'Webtool'))) mkdir(base_path('app'.DIRECTORY_SEPARATOR.'Webtool'));
+        if (!is_dir(base_path('app'.DIRECTORY_SEPARATOR.'Webtool'.DIRECTORY_SEPARATOR.'Commands'))) mkdir(base_path('app'.DIRECTORY_SEPARATOR.'Webtool'.DIRECTORY_SEPARATOR.'Commands'));
+        if (!is_dir(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'))) mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'));
+        if (!is_dir(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'))) mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'));
+        if (!is_file($baseconf))
+        {
+            $default_conf = "";
+            $default_conf .= "<?php" . "\n";
+            $default_conf .= "/**" . "\n";
+            $default_conf .= " *" . "\n";
+            $default_conf .= " * Default config file webtool command schedule" . "\n";
+            $default_conf .= " *" . "\n";
+            $default_conf .= " */" . "\n";
+            $default_conf .= "use App\Webtool\Commands\ExampleCommand;" . "\n";
+            $default_conf .= "" . "\n";
+            $default_conf .= "return [" . "\n";
+            $default_conf .= "\t" . "// [null, 'reporting', 'generate:facing'], # Run artisan after uploaded, not trying if success running" . "\n";
+            $default_conf .= "\t" . "// ['2020-01-01 00:00', 'reporting', 'generate:facing'], # Run artisan by date format, not trying if success running" . "\n";
+            $default_conf .= "\t" . "// ['2020-01-01 00:00', 'reporting', ExampleCommand::class], # Run objec class by date format, not trying if success running" . "\n";
+            $default_conf .= "];" . "\n";
+
+            @file_put_contents($baseconf, $default_conf);
+        }
+
+        /**
+         * 
+         */
+        $confObj = require($baseconf);
+        foreach ($confObj as $confData)
+        {
+            $confObjId = crc32($confData[0].$confData[1].$confData[2]);
+
+            if (!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$confObjId)))
+            {
+                /**
+                 * Validate is now or later
+                 */
+                if (is_null($confData[0]))
+                {
+                    $confAllowRun = 1;
+                }
+                else
+                {
+                    if (Carbon::now()->format('Y-m-d H:i') == $confData[0])
+                    {
+                        $confAllowRun = 1;
+                    }
+                    else
+                    {
+                        $confAllowRun = 0;
+                    }
+                }
+
+                if ($confAllowRun)
+                {
+                    /**
+                     * Validate host
+                     */
+                    if ($confData[1] == $this->WebtoolEnv('DB_DATABASE'))
+                    {
+                        /**
+                         * Validate command
+                         */
+                        if (class_exists($confData[2]))
+                        {
+                            try
+                            {
+                                $confClassLoader = (new $confData[2]);
+                                if (method_exists($confClassLoader, 'handler'))
+                                {
+                                    $confClassReturn = eval("return '".$confClassLoader->handler()."';");
+                                    $this->line('['.Carbon::now().']['.$confObjId.']['.$confData[0].']['.$confData[1].']['.$confData[2].'] return: '.$confClassReturn);
+                                    file_put_contents(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$confObjId), $confClassReturn);
+                                }
+                                else
+                                {
+                                    file_put_contents(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$confObjId.'.err_log'), 'return error: no valid method `handler()` on `'.basename($confData[2]).'`');
+                                    $this->error('['.Carbon::now().']['.$confObjId.']['.$confData[0].']['.$confData[1].']['.$confData[2].'] return error: no valid method `handler()` on `'.basename($confData[2]).'`');
+                                }
+                            }
+                            catch (Exception $th)
+                            {
+                                file_put_contents(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$confObjId.'.err_log'), 'return error: ' . $th->getMessage() . ' on ' . basename($th->getFile()) . ' line ' . $th->getLine());
+                                $this->error('['.Carbon::now().']['.$confObjId.']['.$confData[0].']['.$confData[1].']['.$confData[2].'] return error: ' . $th->getMessage() . ' on ' . basename($th->getFile()) . ' line ' . $th->getLine());
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                $confClassReturn = WebtoolHelper::DoCommand(['/usr/local/bin/webtool', 'app', 'exec', request()->getHost(), 'artisan', $confData[2]]);
+                                $this->line('['.Carbon::now().']['.$confObjId.']['.$confData[0].']['.$confData[1].']['.$confData[2].'] return: '.$confClassReturn);
+                                file_put_contents(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$confObjId), $confClassReturn);
+                            }
+                            catch(Exception $th)
+                            {
+                                file_put_contents(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$confObjId.'.err_log'), 'return error: artisan error code ' . $th->getCode());
+                                $this->error('['.Carbon::now().']['.$confObjId.']['.$confData[0].']['.$confData[1].']['.$confData[2].'] return error: artisan error code ' . $th->getCode());
+                            }
+            
+                        }
+                    }
+                    else
+                    {
+                        $this->error('['.Carbon::now().']['.$confObjId.']['.$confData[0].']['.$confData[1].']['.$confData[2].'] return error: no valid project selected.');
+                    }
+                }
+                else
+                {
+                    $this->error('['.Carbon::now().']['.$confObjId.']['.$confData[0].']['.$confData[1].']['.$confData[2].'] return error: no valid argument started.');
+                }
+            }
+            else
+            {
+                $this->error('['.Carbon::now().']['.$confObjId.']['.$confData[0].']['.$confData[1].']['.$confData[2].'] return error: already started.');
+            }
+        }
     }
 }
