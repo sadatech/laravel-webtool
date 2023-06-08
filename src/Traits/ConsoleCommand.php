@@ -147,6 +147,27 @@ trait ConsoleCommand
 
             @file_put_contents($baseconf, $default_conf);
         }
+        if (!is_file(base_path('app'.DIRECTORY_SEPARATOR.'Webtool'.DIRECTORY_SEPARATOR.'Commands'.DIRECTORY_SEPARATOR.'ExampleCommand.php')))
+        {
+            $default_com = "";
+            $default_com .= "<?php" . "\n";
+            $default_com .= "namespace App\Webtool\Commands;" . "\n";
+            $default_com .= "/**" . "\n";
+            $default_com .= " *" . "\n";
+            $default_com .= " * Default Example Command Webtool" . "\n";
+            $default_com .= " *" . "\n";
+            $default_com .= " */" . "\n";
+            $default_com .= "" . "\n";
+            $default_com .= "class ExampleCommand" . "\n";
+            $default_com .= "{" . "\n";
+            $default_com .= "\t" . "public function handler()" . "\n";
+            $default_com .= "\t" . "{" . "\n";
+            $default_com .= "\t\t" . "return \"Webtool Command Work!\";" . "\n";
+            $default_com .= "\t" . "}" . "\n";
+            $default_com .= "}" . "\n";
+
+            @file_put_contents(base_path('app'.DIRECTORY_SEPARATOR.'Webtool'.DIRECTORY_SEPARATOR.'Commands'.DIRECTORY_SEPARATOR.'ExampleCommand.php'), $default_com);
+        }
 
         /**
          * 
