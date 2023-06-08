@@ -8,9 +8,15 @@ use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
 use App\JobTrace;
 use App\Helper\ConfigHelper;
+use Sadatech\Webtool\Traits\ConsoleCommand;
 
 class Console extends Command
 {
+    /**
+     * Use trait
+     */
+    use ConsoleCommand;
+
     /**
      * The name and signature of the console command.
      *
@@ -47,7 +53,7 @@ class Console extends Command
         
         if ($type == "total-job")
         {
-            $this->line(DB::table('jobs')->whereNull('reserved_at')->count());
+            $this->line($this->WebtoolTotalJob());
         } else
         if ($type == "env")
         {
