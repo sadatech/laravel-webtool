@@ -41,6 +41,7 @@ trait ConsoleCommand
             $localfile = str_replace('---123---', 'https', $localfile);
             $localfile = str_replace(public_path(''), null, $localfile);
             $cloudfile = "export-data/".str_replace('//', '/', str_replace('_', '-', ConfigHelper::GetConfig("DB_DATABASE"))."/".$localfile);
+            $hashfile  = hash('md5', $tracejob->results);
 
             if ($mdate < $ndate)
             {
@@ -71,24 +72,36 @@ trait ConsoleCommand
                             'status' => 'PROCESSING',
                         ]);
 
-                        if (FileStorage::disk("spaces")->put($cloudfile, fopen(public_path($localfile), 'r+'), "public"))
+                        // handler read file
+                        try
                         {
-                            File::delete(public_path($localfile));
-                            $cloudurl = str_replace('https://'.config('filesystems.disks.spaces.bucket').str_replace('https://', '.', config('filesystems.disks.spaces.endpoint')), config('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($cloudfile));
-                            JobTrace::where('id', $tracejob->id)->first()->update([
-                                'explanation' => 'File archived on CDN servers.',
-                                'log' => 'File archived on CDN servers.',
-                                'url' => $cloudurl,
-                                'status' => 'DONE',
-                            ]);
+                            $filereader = fopen(public_path($localfile), 'r+');
+                            if (FileStorage::disk("spaces")->put($cloudfile, $filereader, "public"))
+                            {
+                                File::delete(public_path($localfile));
+                                $cloudurl = str_replace('https://'.config('filesystems.disks.spaces.bucket').str_replace('https://', '.', config('filesystems.disks.spaces.endpoint')), config('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($cloudfile));
+                                JobTrace::where('id', $tracejob->id)->first()->update([
+                                    'explanation' => 'File archived on CDN servers.',
+                                    'log' => 'File archived on CDN servers.',
+                                    'url' => $cloudurl,
+                                    'status' => 'DONE',
+                                ]);
+                            }
+                            else
+                            {
+                                JobTrace::where('id', $tracejob->id)->first()->update([
+                                    'explanation' => 'Failed sync to CDN servers.',
+                                    'log' => 'Failed sync to CDN servers.',
+                                    'status' => 'DONE',
+                                ]);
+                            }
                         }
-                        else
+                        catch (Exception $ex)
                         {
                             JobTrace::where('id', $tracejob->id)->first()->update([
-                                'explanation' => 'Failed sync to CDN servers.',
-                                'log' => 'Failed sync to CDN servers.',
-                                'url' => $tracejob->results,
-                                'status' => 'DONE',
+                                'explanation' => $ex->getMessage(),
+                                'log' => $ex->getMessage(),
+                                'status' => 'FAILED',
                             ]);
                         }
                     }
