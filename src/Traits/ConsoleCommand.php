@@ -70,6 +70,7 @@ trait ConsoleCommand
                             'log' => 'Please wait a moment, file is under sync to CDN servers.',
                             'status' => 'PROCESSING',
                         ]);
+
                         if (FileStorage::disk("spaces")->put($cloudfile, fopen(public_path($localfile), 'r+'), "public"))
                         {
                             File::delete(public_path($localfile));
@@ -86,6 +87,7 @@ trait ConsoleCommand
                             JobTrace::where('id', $tracejob->id)->first()->update([
                                 'explanation' => 'Failed sync to CDN servers.',
                                 'log' => 'Failed sync to CDN servers.',
+                                'url' => $tracejob->results,
                                 'status' => 'DONE',
                             ]);
                         }
