@@ -10,7 +10,6 @@ class Webtool
     {
         if (file_exists($command[0]))
         {
-            array_unshift($command, 'nohup'); // fix timeout command
             $process = new Process($command, null, [
                 'SYNC_USE_WEBUI' => 'yes',
                 'SYNC_FORCE_FETCH' => 'yes',
