@@ -27,6 +27,57 @@ trait ConsoleCommand
         return ConfigHelper::GetConfig($env_arg);
     }
 
+    public function WebtoolValidateSyncFiles()
+    {
+        $jobtraces = JobTrace::whereIn('status', ['FAILED'])->where('explanation', 'LIKE', '%Permission denied%')->orderByDesc('created_at')->get();
+
+        foreach ($jobtraces as $tracejob)
+        {
+            $ndate = Carbon::now()->timestamp;
+            $mdate = Carbon::parse($tracejob->created_at)->addDays(env('EXPORT_EXPIRED_DAYS', 3))->timestamp;
+
+            if ($mdate < $ndate)
+            {
+                if (File::exists(public_path($localfile)))
+                {
+                    File::delete(public_path($localfile));
+                }
+
+                if (FileStorage::disk("spaces")->exists($cloudfile))
+                {
+                    FileStorage::disk("spaces")->delete($cloudfile);
+                }
+
+                JobTrace::where('id', $tracejob->id)->first()->update([
+                    'status' => 'DELETED',
+                    'log' => 'File may no longer be available due to an export error or the file has expired.',
+                ]);
+            }
+            else
+            {
+                if (File::exists(public_path($localfile)))
+                {
+                    if (!FileStorage::disk("spaces")->exists($cloudfile))
+                    {
+                        JobTrace::where('id', $tracejob->id)->first()->update([
+                            'status' => 'PROCESSING',
+                        ]);
+                    }
+                }
+                else
+                {
+                    if (!$tracejob->url)
+                    {
+                        JobTrace::where('id', $tracejob->id)->first()->update([
+                            'status' => 'DELETED',
+                            'log' => 'File may no longer be available due to an export error or the file has expired.',
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+
     public function WebtoolExportSyncFiles()
     {
         $jobtraces = JobTrace::whereIn('status', ['DONE'])->orderByDesc('created_at')->get();
