@@ -3,7 +3,16 @@
     "description": "Laravel helper Webtool commands",
     "license": "MIT",
     "type": "library",
+    "homepage": "https://sada.id",
+    "authors": [
+        {
+            "name": "Andika Muhammad Cahya",
+            "email": "andika@sada.id",
+            "role": "Developer"
+        }
+    ],
     "require": {
+        "php": ">=7.1",
         "laravelcollective/remote": "^v5.4"
     },
     "autoload": {
