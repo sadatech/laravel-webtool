@@ -343,7 +343,7 @@ trait ConsoleCommand
             // write running process
             if (file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'proc_'.$confObjId)))
             {
-                unlink(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'proc_'.$confObjId));
+                // unlink(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'proc_'.$confObjId));
             }
         }
     }
