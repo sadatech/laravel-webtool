@@ -249,6 +249,12 @@ trait ConsoleCommand
         {
             $confObjId = crc32($confData[0].$confData[1].$confData[2]);
 
+            // write running process
+            if (!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'proc_'.$confObjId)))
+            {
+                file_put_contents(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'proc_'.$confObjId), 'run');
+            }
+
             if (!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$confObjId)))
             {
                 /**
@@ -332,6 +338,12 @@ trait ConsoleCommand
             else
             {
                 $this->error('['.Carbon::now().']['.$confObjId.']['.$confData[0].']['.$confData[1].']['.$confData[2].'] return error: already started.');
+            }
+
+            // write running process
+            if (file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'proc_'.$confObjId)))
+            {
+                unlink(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'proc_'.$confObjId));
             }
         }
     }
