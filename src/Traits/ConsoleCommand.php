@@ -247,7 +247,7 @@ trait ConsoleCommand
         $confObj = require($baseconf);
         foreach ($confObj as $confData)
         {
-            $confObjId = crc32($confData[0].$confData[1].$confData[2]);
+            $confObjId = hash('md5', $confData[0].$confData[1].$confData[2]);
 
             // write running process
             if (!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'webtool'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'proc_'.$confObjId)))
