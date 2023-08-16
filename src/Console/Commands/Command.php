@@ -47,10 +47,8 @@ class Command extends IlluminateCommand
         
         if ($type == "worker")
         {
-            $cmd["exporter"] = Artisan::call("queue:work", ["--once" => null, "--tries" => 1, "--timeout" => 1200, "--memory" => 4096, "--memory" => 3, "--sleep" => "3", "-vvv" => null]);
-            $cmd["syncfile"] = Artisan::call("webtool:fetch", ["--type" => "export-sync-files", "-vvv" => null]);
-            $this->line($cmd["exporter"]);
-            $this->line($cmd["syncfile"]);
+            $this->call("queue:work", ["--once" => null, "--tries" => 1, "--timeout" => 1200, "--memory" => 4096, "--memory" => 3, "--sleep" => "3", "-vvv" => null]);
+            $this->call("webtool:fetch", ["--type" => "export-sync-files", "-vvv" => null]);
         }
         else
         {
