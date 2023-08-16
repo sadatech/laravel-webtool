@@ -19,7 +19,7 @@ trait ConsoleCommand
      */
     public function WebtoolDoWorker()
     {
-        $this->call("webtool:fetch" ["--type" => "do-command"]);
+        $this->call("webtool:fetch", ["--type" => "do-command"]);
         $this->call("queue:work", ["--once" => null, "--tries" => $this->WebtoolEnv('WORKER_TRIES', 1), "--timeout" => $this->WebtoolEnv('WORKER_TIMEOUT', 1200), "--memory" => $this->WebtoolEnv('WORKER_MEMORY', 2048), "--delay" => $this->WebtoolEnv('WORKER_DELAY', 3), "--sleep" => $this->WebtoolEnv('WORKER_SLEEP', 3), "-vvv" => null]);
         $this->call("webtool:fetch", ["--type" => "export-sync-files", "-vvv" => null]);
         sleep(15);
