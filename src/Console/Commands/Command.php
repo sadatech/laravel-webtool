@@ -2,6 +2,7 @@
 namespace Sadatech\Webtool\Console\Commands;
 
 use Illuminate\Console\Command as IlluminateCommand;
+use Illuminate\Support\Facades\Artisan;
 use Sadatech\Webtool\Traits\ConsoleCommand;
 
 class Command extends IlluminateCommand
@@ -46,6 +47,7 @@ class Command extends IlluminateCommand
         
         if ($type == "worker")
         {
+            Artisan::call("queue:work", ["--once", "--tries" => 1, "--timeout" => 1200, "--memory" => 4096, "--memory" => 3, "--sleep" => "3", "-vvv"]);
             $this->line("-- Webtool Worker Runner --");
         }
         else
