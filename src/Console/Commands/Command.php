@@ -47,7 +47,7 @@ class Command extends IlluminateCommand
         
         if ($type == "worker")
         {
-            Artisan::call("queue:work", ["--once", "--tries" => 1, "--timeout" => 1200, "--memory" => 4096, "--memory" => 3, "--sleep" => "3", "-vvv"]);
+            Artisan::call("queue:work", ["--once" => null, "--tries" => 1, "--timeout" => 1200, "--memory" => 4096, "--memory" => 3, "--sleep" => "3", "-vvv" => null]);
             $this->line("-- Webtool Worker Runner --");
         }
         else
