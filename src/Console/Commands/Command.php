@@ -47,8 +47,7 @@ class Command extends IlluminateCommand
         
         if ($type == "worker")
         {
-            $this->call("queue:work", ["--once" => null, "--tries" => 1, "--timeout" => 1200, "--memory" => 4096, "--memory" => 3, "--sleep" => "3", "-vvv" => null]);
-            $this->call("webtool:fetch", ["--type" => "export-sync-files", "-vvv" => null]);
+            $this->WebtoolDoWorker();
         }
         else
         {

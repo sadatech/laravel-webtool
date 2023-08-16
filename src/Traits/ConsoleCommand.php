@@ -15,6 +15,15 @@ trait ConsoleCommand
 {
 
     /**
+     * Public function
+     */
+    public function WebtoolDoWorker()
+    {
+        $this->call("queue:work", ["--once" => null, "--tries" => $this->WebtoolEnv('WORKER_TRIES', 1), "--timeout" => $this->WebtoolEnv('WORKER_TIMEOUT', 1200), "--memory" => $this->WebtoolEnv('WORKER_MEMORY', 2048), "--delay" => $this->WebtoolEnv('WORKER_DELAY', 3), "--sleep" => $this->WebtoolEnv('WORKER_SLEEP', 3), "-vvv" => null]);
+        $this->call("webtool:fetch", ["--type" => "export-sync-files", "-vvv" => null]);
+    }
+
+    /**
      * Private functions
      */
     public function WebtoolTotalJob()
@@ -22,9 +31,9 @@ trait ConsoleCommand
         return DB::table('jobs')->whereNull('reserved_at')->count();
     }
 
-    public function WebtoolEnv($env_arg)
+    public function WebtoolEnv($env_arg, $env_opt = null)
     {
-        return ConfigHelper::GetConfig($env_arg);
+        return env($env_arg, $env_opt);
     }
 
     public function WebtoolValidateSyncFiles()
