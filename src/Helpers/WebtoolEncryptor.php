@@ -12,7 +12,7 @@ class WebtoolEncryptor
 
     public function Make($string, $salt = '')
     {
-        $keyName = hash('sha256', md5(sha1(base64_encode($string))).md5($salt));
+        $keyName = hash('sha256', md5(sha1(base64_encode($string))).md5($salt).sha1(time()));
         $keyData = gzcompress($string, 9);
 
         if (!file_exists($this->local_file_path.$keyName))
