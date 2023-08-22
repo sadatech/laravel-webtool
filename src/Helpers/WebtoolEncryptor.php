@@ -37,7 +37,7 @@ class WebtoolEncryptor
             return $keyData;
         }
         
-        throw new Exception("Error Processing Request: Failed to Disassemble key, not registered on system.", 1);
+        throw new \Exception("Error Processing Request: Failed to Disassemble key, not registered on system.", 1);
         
         return false;
     }
