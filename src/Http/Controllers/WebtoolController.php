@@ -22,7 +22,7 @@ class WebtoolController extends Controller
     public function liveSyncAction()
     {
         $process = "<style>code{color:white;}</style><pre><code>";
-        $process .= WebtoolHelper::DoCommand(['/usr/local/bin/webtool', 'app', 'sync', request()->getHost()]);
+        $process .= WebtoolHelper::DoCommand(['gb', 'app_sync', request()->getHost()]);
         $process .= "</code></pre>";
 
         return $process;
