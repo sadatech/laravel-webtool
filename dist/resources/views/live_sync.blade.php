@@ -23,12 +23,10 @@
     </style>
 </head>
 <body>
-    <div id="webtool-return-sync">
-        <iframe src="{{ route('webtool.live-sync.action') }}?_token={{ csrf_token() }}" frameborder="0"></iframe>
-    </div>
+    <div id="webtool-return-sync"></div>
 
-    <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script> -->
-    <!-- <script type="text/javascript">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
         $(document).ready(function(){
             $.ajax({
                 url: "{{ route('webtool.live-sync.action') }}?_token={{ csrf_token() }}",
@@ -45,6 +43,6 @@
                 })
             });
         });
-    </script> -->
+    </script>
 </body>
 </html>

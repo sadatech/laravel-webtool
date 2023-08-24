@@ -11,7 +11,8 @@ class Webtool
         $process = new Process($command, null, [
             'SYNC_USE_WEBUI' => 'yes',
             'SYNC_FORCE_FETCH' => 'yes',
-            'COMPOSER_HOME' => '/home/sadatech/.config/composer'
+            'COMPOSER_HOME' => '/home/sadatech/.config/composer',
+            'HOME' => '/home/sadatech',
         ]);
         $process->run();
 
