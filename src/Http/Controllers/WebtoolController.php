@@ -30,8 +30,8 @@ class WebtoolController extends Controller
         $process .= WebtoolHelper::DoCommand(['php', "/data/".request()->getHost()."/sadata-reporting/artisan", "cache:clear", "--no-interaction", "-vvv"]);
         $process .= WebtoolHelper::DoCommand(['php', "/data/".request()->getHost()."/sadata-reporting/artisan", "view:clear", "--no-interaction", "-vvv"]);
         $process .= WebtoolHelper::DoCommand(['php', "/data/".request()->getHost()."/sadata-reporting/artisan", "migrate", "--no-interaction", "--force", "-vvv"]);
-        $process .= WebtoolHelper::DoCommand(['php', "composer", "--working-dir=/data/".request()->getHost()."/sadata-reporting", "-n", "update", "--ignore-platform-req=ext-mongodb", "--no-plugins", "--no-interaction"]);
-        $process .= WebtoolHelper::DoCommand(['php', "composer", "--working-dir=/data/".request()->getHost()."/sadata-reporting", "-n", "dumpa", "--no-plugins", "-o", "-a"]);
+        $process .= WebtoolHelper::DoCommand(['php', "/usr/bin/composer", "--working-dir=/data/".request()->getHost()."/sadata-reporting", "-n", "update", "--ignore-platform-req=ext-mongodb", "--no-plugins", "--no-interaction"]);
+        $process .= WebtoolHelper::DoCommand(['php', "/usr/bin/composer", "--working-dir=/data/".request()->getHost()."/sadata-reporting", "-n", "dumpa", "--no-plugins", "-o", "-a"]);
         $process .= "</code></pre>";
 
         return $process;
