@@ -22,7 +22,14 @@ class WebtoolController extends Controller
     public function liveSyncAction()
     {
         $process = "<style>code{color:white;}</style><pre><code>";
-        $process .= WebtoolHelper::DoCommand(['gb', 'app_sync', request()->getHost()]);
+        $process .= "[#] Starting live synchronize... <br>";
+        $process .= WebtoolHelper::DoCommand(['git', '-C', "/data/".request()->getHost()."/sadata-reporting", "status"]);
+        $process .= WebtoolHelper::DoCommand(['git', '-C', "/data/".request()->getHost()."/sadata-reporting", "restore", "/data/".request()->getHost()."/sadata-reporting"]);
+        $process .= WebtoolHelper::DoCommand(['git', '-C', "/data/".request()->getHost()."/sadata-reporting", "pull", "origin", "master"]);
+        $process .= WebtoolHelper::DoCommand(['php',"/data/".request()->getHost()."/sadata-reporting/artisan", "clear-compiled", "-vvv"]);
+        $process .= WebtoolHelper::DoCommand(['php',"/data/".request()->getHost()."/sadata-reporting/artisan", "cache:clear", "--no-interaction", "-vvv"]);
+        $process .= WebtoolHelper::DoCommand(['php',"/data/".request()->getHost()."/sadata-reporting/artisan", "view:clear", "--no-interaction", "-vvv"]);
+        $process .= WebtoolHelper::DoCommand(['php',"/data/".request()->getHost()."/sadata-reporting/artisan", "migrate", "--no-interaction", "--force", "-vvv"]);
         $process .= "</code></pre>";
 
         return $process;
