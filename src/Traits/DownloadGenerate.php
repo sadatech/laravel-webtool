@@ -5,13 +5,14 @@ use App\JobTrace;
 use Sadatech\Webtool\Helpers\Webtool as WebtoolHelper;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage as FileStorage;
+use Sadatech\Webtool\Helpers\WebtoolEncryptor;
 
 trait DownloadGenerate
 {
     public function downloadGenerate($uid)
     {
         // get token uid
-        $download['pkg'] = json_decode(Encryptor::disassemble($uid));
+        $download['pkg'] = json_decode(WebtoolEncryptor::Disassemble($uid));
         $download['id']  = $download['pkg']->id;
         $download['url'] = $download['pkg']->location;
 
