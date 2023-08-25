@@ -23,4 +23,9 @@ class Webtool
 
         return $process->getOutput();
     }
+
+    public static function GetConfig($key, $value = null)
+    {
+        return config($key, $value);
+    }
 }
