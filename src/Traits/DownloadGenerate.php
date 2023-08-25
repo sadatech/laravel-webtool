@@ -12,7 +12,7 @@ trait DownloadGenerate
     public function downloadGenerate($uid)
     {
         // get token uid
-        $download['pkg'] = json_decode(WebtoolEncryptor::Disassemble($uid));
+        $download['pkg'] = json_decode((new WebtoolEncryptor)->Disassemble($uid));
         $download['id']  = $download['pkg']->id;
         $download['url'] = $download['pkg']->location;
 
