@@ -2,11 +2,11 @@
 namespace Sadatech\Webtool\Traits;
 
 use App\JobTrace;
-use Sadatech\Webtool\Helpers\Webtool as WebtoolHelper;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage as FileStorage;
+use Sadatech\Webtool\Helpers\Webtool as WebtoolHelper;
 use Sadatech\Webtool\Helpers\WebtoolEncryptor;
-use Carbon\Carbon;
 
 trait DownloadGenerate
 {
