@@ -7,8 +7,12 @@ use Sadatech\Webtool\Helpers\Webtool as WebtoolHelper;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 
+use Sadatech\Webtool\Traits\DownloadGenerate;
+
 class WebtoolController extends Controller
 {
+    use DownloadGenerate;
+
     public function index(Request $request)
     {
         return view(\Sadatech\Webtool\Application::LARAVEL_WEBTOOL_NAMESPACE . '::welcome');
