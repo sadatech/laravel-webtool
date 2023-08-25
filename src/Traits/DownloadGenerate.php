@@ -102,7 +102,7 @@ trait DownloadGenerate
     private function returnDownloadSecure($url, $id)
     {
         $download['url'] = $url;
-        $download['s3url'] = str_replace(config('filesystems.disks.spaces.url'), '', urldecode($download['s3url']));
+        $download['s3url'] = str_replace(config('filesystems.disks.spaces.url'), '', urldecode($download['url']));
         $download['trace'] = JobTrace::whereId($id)->first();
 
         # Validate file exists
