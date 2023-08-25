@@ -6,6 +6,7 @@ use Sadatech\Webtool\Helpers\Webtool as WebtoolHelper;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage as FileStorage;
 use Sadatech\Webtool\Helpers\WebtoolEncryptor;
+use Carbon\Carbon;
 
 trait DownloadGenerate
 {
