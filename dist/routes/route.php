@@ -16,4 +16,4 @@ Route::post('/live/sync/action', 'WebtoolController@liveSyncAction')->name('live
 /**
  * Download Generate URL
  */
-Route::get('/download/generate/{uid?}', 'WebtoolController@downloadGenerate')->name('download.generate');
+Route::post('/download/generate/{uid?}', 'WebtoolController@downloadGenerate')->name('download.generate');

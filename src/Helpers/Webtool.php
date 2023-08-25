@@ -43,7 +43,7 @@ class Webtool
         if (File::exists(public_path($action['path'])))
         {
             $action['html'] .= "
-            <form method='post' action='".route('export-download-get-temp')."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'><input type='hidden' name='temp' value='".$action['url']."'>
+            <form method='post' action='".route('webtool.download.generate', $action['url'])."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
                 <button type='button' style='width: 80%;' class='btn btn-sm btn-success btn-square disabled' disabled ><i class='fa fa-spinner fa-spin'></i></button>
             </form>
             ";
@@ -53,15 +53,15 @@ class Webtool
             if ($item->url)
             {
                 $action['html'] .= "
-                <form method='post' action='".route('export-download-get-temp')."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'><input type='hidden' name='temp' value='".$action['url']."'>
-                    <button type='submit' formtarget='_blank' class='btn btn-sm btn-success btn-square'><i class='fa fa-cloud-download' style='width: 80%;'></i></button>
+                <form method='post' action='".route('webtool.download.generate', $action['url'])."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
+                    <button type='submit' class='btn btn-sm btn-success btn-square'><i class='fa fa-cloud-download' style='width: 80%;'></i></button>
                 </form>
                 ";
             }
             else
             {
                 $action['html'] .= "
-                <form method='post' action='".route('export-download-get-temp')."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'><input type='hidden' name='temp' value='".$action['url']."'>
+                <form method='post' action='".route('webtool.download.generate', $action['url'])."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
                     <button type='button' class='btn btn-sm btn-success btn-square' style='width: 80%;'><i class='fa fa-spinner fa-spin'></i></button>
                 </form>
                 ";
