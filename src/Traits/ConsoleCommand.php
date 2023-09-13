@@ -67,7 +67,7 @@ trait ConsoleCommand
 
                 JobTrace::where('id', $tracejob->id)->first()->update([
                     'status' => 'DELETED',
-                    'log' => 'File may no longer be available due to an export error or the file has expired.',
+                    'log' => 'File may no longer be available due to an export error or the file has expired. (WebtoolValidateSyncFiles_MNdate_01)',
                 ]);
             }
             else
@@ -87,7 +87,7 @@ trait ConsoleCommand
                     {
                         JobTrace::where('id', $tracejob->id)->first()->update([
                             'status' => 'DELETED',
-                            'log' => 'File may no longer be available due to an export error or the file has expired.',
+                            'log' => 'File may no longer be available due to an export error or the file has expired. (WebtoolValidateSyncFiles_FErr_01)',
                         ]);
                     }
                 }
@@ -125,7 +125,7 @@ trait ConsoleCommand
 
                 JobTrace::where('id', $tracejob->id)->first()->update([
                     'status' => 'DELETED',
-                    'log' => 'File may no longer be available due to an export error or the file has expired.',
+                    'log' => 'File may no longer be available due to an export error or the file has expired. (WebtoolExportSyncFiles_MNdate_01)',
                 ]);
             }
             else
@@ -191,7 +191,7 @@ trait ConsoleCommand
                     {
                         JobTrace::where('id', $tracejob->id)->first()->update([
                             'status' => 'DELETED',
-                            'log' => 'File may no longer be available due to an export error or the file has expired.',
+                            'log' => 'File may no longer be available due to an export error or the file has expired. (WebtoolExportSyncFiles_FErr_01)',
                         ]);
                     }
                 }
