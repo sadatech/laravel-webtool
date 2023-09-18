@@ -11,7 +11,6 @@ trait Kernel
      * @var array
      */
     public $commands = [
-        \Sadatech\Webtool\Console\Commands\Console::class,
-        \Sadatech\Webtool\Console\Commands\Command::class
+        \Sadatech\Webtool\Console\Commands\Webtool_CLI::class
     ];
 }

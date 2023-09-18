@@ -1,14 +1,13 @@
 {
     "name": "sadatech/laravel-webtool",
-    "description": "Laravel helper Webtool commands",
+    "description": "Common Laravel - Webtool commands",
     "license": "MIT",
     "type": "library",
     "homepage": "https://sada.id",
     "authors": [
         {
             "name": "Andika Muhammad Cahya",
-            "email": "andika@sada.id",
-            "role": "Developer"
+            "email": "andika@sada.id"
         }
     ],
     "require": {
