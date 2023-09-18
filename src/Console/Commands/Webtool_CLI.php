@@ -46,6 +46,10 @@ class Webtool_CLI extends Command
         {
             $this->WebtoolDoWorker();
         }
+        elseif ($_command_name == "job_count")
+        {
+            //
+        }
         else
         {
             $this->line("Undefined type commands.");
