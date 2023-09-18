@@ -12,6 +12,11 @@ class Common
         return config($key, $value);
     }
 
+    public static function GetEnv($key, $value = null)
+    {
+        return env($key, $value);
+    }
+
     public static function GenerateActionLink($item, $path)
     {
         $action['url']  = str_replace('http://localhost/', asset(''), $item->results);
@@ -48,5 +53,18 @@ class Common
         }
 
         return $action['html'];
+    }
+
+    public static function WaitForSec($sec)
+    {
+        $i = 1;
+        $last_time = $_SERVER['REQUEST_TIME'];
+        while($i > 0){
+            $total = $_SERVER['REQUEST_TIME'] - $last_time;
+            if($total >= 2){
+                return 1;
+                $i = -1;
+            }
+        }
     }
 }

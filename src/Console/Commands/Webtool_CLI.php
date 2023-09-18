@@ -44,7 +44,7 @@ class Webtool_CLI extends Command
 
         if ($_command_name == "worker")
         {
-            //
+            $this->WebtoolDoWorker();
         }
         else
         {
