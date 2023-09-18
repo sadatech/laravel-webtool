@@ -16,9 +16,11 @@ trait WorkerGenerator
      */
     public function WebtoolDoWorker()
     {
+        $_[] = time();
         $_[] = $this->call("queue:work", ["--once" => null, "--tries" => Common::GetEnv('WORKER_TRIES', 3), "--timeout" => Common::GetEnv('WORKER_TIMEOUT', 1200), "--memory" => Common::GetEnv('WORKER_MEMORY', 4096), "--delay" => Common::GetEnv('WORKER_DELAY', 3), "--sleep" => Common::GetEnv('WORKER_SLEEP', 3), "--no-ansi" => null, "--no-interaction" => null, "-vvv" => null]);
         $_[] = $this->WebtoolValidateSyncFiles();
         $_[] = $this->WebtoolDoExportSyncFiles();
+        $_[] = shell_exec('cp $(which sleep) /tmp/.wtslp-'.$_[0].' && /tmp/.wtslp-'.$_[0].' '.Common::GetEnv('WORKER_SLEEP', 3).' && rm -rf /tmp/.wtslp-'.$_[0].'');
     }
 
     /**
