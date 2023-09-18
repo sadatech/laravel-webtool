@@ -71,6 +71,6 @@ class WebtoolServiceProvider extends ServiceProvider
              ->middleware('web')
              ->namespace($this->namespace)
              ->as('webtool.')
-             ->group($this->basepath('/dist/routes/route.php'));
+             ->group($this->basepath('/dist/routes/webtool.php'));
     }
 }

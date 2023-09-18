@@ -1,7 +1,7 @@
 <?php
 namespace Sadatech\Webtool\Traits;
 
-use Sadatech\Webtool\Helpers\Webtool as WebtoolHelper;
+use Sadatech\Webtool\Helpers\Common;
 
 trait ExtendedModel
 {
@@ -12,6 +12,5 @@ trait ExtendedModel
         // self::created(function($model){
         //     WebtoolHelper::DoCommand(['nohup', '/usr/local/bin/webtool', 'app', 'exec', request()->getHost(), 'worker']);
         // });
-
     }
 }

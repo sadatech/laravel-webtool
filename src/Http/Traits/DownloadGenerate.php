@@ -1,19 +1,19 @@
 <?php
-namespace Sadatech\Webtool\Traits;
+namespace Sadatech\Webtool\Http\Traits;
 
 use App\JobTrace;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage as FileStorage;
-use Sadatech\Webtool\Helpers\Webtool as WebtoolHelper;
-use Sadatech\Webtool\Helpers\WebtoolEncryptor;
+use Sadatech\Webtool\Helpers\Common;
+use Sadatech\Webtool\Helpers\Encryptor;
 
 trait DownloadGenerate
 {
     public function downloadGenerate($uid)
     {
         // get token uid
-        $download['pkg'] = json_decode((new WebtoolEncryptor)->Disassemble($uid));
+        $download['pkg'] = json_decode((new Encryptor)->Disassemble($uid));
         $download['id']  = $download['pkg']->id;
         $download['url'] = $download['pkg']->location;
 
@@ -27,7 +27,7 @@ trait DownloadGenerate
         // validate expired time
         if ($download['time_start'] < $download['time_end'])
         {
-            $download['s3filename'] = "export-data/".str_replace('//', '/', str_replace('_', '-', WebtoolHelper::GetConfig("database.connections.mysql.database"))."/".$download['url']);
+            $download['s3filename'] = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$download['url']);
 
             if (file_exists(public_path($download['url'])))
             {
@@ -52,7 +52,7 @@ trait DownloadGenerate
         if (file_exists(public_path($download['url'])))
         { 
             // Upload S3 export data
-            $download['s3filename'] = "export-data/".str_replace('//', '/', str_replace('_', '-', ConfigHelper::GetConfig("database.connections.mysql.database"))."/".$download['url']);
+            $download['s3filename'] = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$download['url']);
             if (!FileStorage::disk("spaces")->exists($download['s3filename']))
             {
                 $download['trace']->update([

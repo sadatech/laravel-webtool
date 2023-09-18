@@ -1,43 +1,27 @@
 <?php
 namespace Sadatech\Webtool\Helpers;
 
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage as FileStorage;
-use Sadatech\Webtool\Helpers\WebtoolEncryptor;
+use Sadatech\Webtool\Helpers\Encryptor;
 
-
-class Webtool
+class Common
 {
-    public static function DoCommand($command)
-    {
-        $process = new Process($command, null, [
-            'SYNC_USE_WEBUI' => 'yes',
-            'SYNC_FORCE_FETCH' => 'yes',
-            'COMPOSER_HOME' => '/home/sadatech/.config/composer',
-            'HOME' => '/home/sadatech',
-        ]);
-        $process->run();
-
-        if (!$process->isSuccessful())
-        {
-            throw new ProcessFailedException($process);
-        }
-
-        return $process->getOutput();
-    }
 
     public static function GetConfig($key, $value = null)
     {
         return config($key, $value);
     }
 
+    public static function GetEnv($key, $value = null)
+    {
+        return env($key, $value);
+    }
+
     public static function GenerateActionLink($item, $path)
     {
         $action['url']  = str_replace('http://localhost/', asset(''), $item->results);
         $action['path'] = is_null($path) ? $item->results : ("/export/report/". $path . basename(str_replace('---123---', 'https', str_replace('https','---123---', str_replace('http','---123---', $action['url'])))));
-        $action['url']  = (new WebtoolEncryptor)->Make(json_encode(['id' => $item->id, 'location' => $action['path']]));
+        $action['url']  = (new Encryptor)->Make(json_encode(['id' => $item->id, 'location' => $action['path']]));
         $action['html'] = '';
 
         if (File::exists(public_path($action['path'])))
@@ -69,5 +53,18 @@ class Webtool
         }
 
         return $action['html'];
+    }
+
+    public static function WaitForSec($sec)
+    {
+        $i = 1;
+        $last_time = $_SERVER['REQUEST_TIME'];
+        while($i > 0){
+            $total = $_SERVER['REQUEST_TIME'] - $last_time;
+            if($total >= 2){
+                return 1;
+                $i = -1;
+            }
+        }
     }
 }

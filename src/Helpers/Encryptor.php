@@ -1,7 +1,7 @@
 <?php
 namespace Sadatech\Webtool\Helpers;
 
-class WebtoolEncryptor
+class Encryptor
 {
     private $local_file_prefix = '.wtenc';
     private $local_file_path;
