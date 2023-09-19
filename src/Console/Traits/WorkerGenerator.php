@@ -16,11 +16,11 @@ trait WorkerGenerator
      */
     public function WebtoolDoWorker()
     {
-        $_[] = time();
+        $_[] = "webtool-worker-sleep-cooldown-".hash("sha256", time());
         $_[] = $this->call("queue:work", ["--once" => null, "--tries" => Common::GetEnv('WORKER_TRIES', 3), "--timeout" => Common::GetEnv('WORKER_TIMEOUT', 1200), "--memory" => Common::GetEnv('WORKER_MEMORY', 4096), "--delay" => Common::GetEnv('WORKER_DELAY', 3), "--sleep" => Common::GetEnv('WORKER_SLEEP', 3), "--no-ansi" => null, "--no-interaction" => null, "-vvv" => null]);
         $_[] = $this->WebtoolValidateSyncFiles();
         $_[] = $this->WebtoolDoExportSyncFiles();
-        $_[] = shell_exec('cp $(which sleep) /tmp/.wtslp-'.$_[0].' && /tmp/.wtslp-'.$_[0].' '.Common::GetEnv('WORKER_SLEEP', 3).' && rm -rf /tmp/.wtslp-'.$_[0].'');
+        $_[] = shell_exec('cp $(which sleep) '.sys_get_temp_dir().DIRECTORY_SEPARATOR.$_[0].' && '.sys_get_temp_dir().DIRECTORY_SEPARATOR.$_[0].' '.Common::GetEnv('WORKER_SLEEP', 15).' && rm -rf '.sys_get_temp_dir().DIRECTORY_SEPARATOR.$_[0]);
     }
 
     /**
@@ -60,7 +60,7 @@ trait WorkerGenerator
 
                 JobTrace::where('id', $tracejob->id)->first()->update([
                     'status' => 'DELETED',
-                    'log' => 'File may no longer be available due to an export error or the file has expired. (WebtoolValidateSyncFiles_MNdate_01)',
+                    'log' => 'File may no longer be available due to an export error or the file has expired. ('.__FUNCTION__.'_MNdate_01)',
                 ]);
             }
             else
@@ -80,7 +80,7 @@ trait WorkerGenerator
                     {
                         JobTrace::where('id', $tracejob->id)->first()->update([
                             'status' => 'DELETED',
-                            'log' => 'File may no longer be available due to an export error or the file has expired. (WebtoolValidateSyncFiles_FErr_01)',
+                            'log' => 'File may no longer be available due to an export error or the file has expired. ('.__FUNCTION__.'_FErr_01)',
                         ]);
                     }
                 }
@@ -123,7 +123,7 @@ trait WorkerGenerator
 
                 JobTrace::where('id', $tracejob->id)->first()->update([
                     'status' => 'DELETED',
-                    'log' => 'File may no longer be available due to an export error or the file has expired. (WebtoolExportSyncFiles_MNdate_01)',
+                    'log' => 'File may no longer be available due to an export error or the file has expired. ('.__FUNCTION__.'_MNdate_01)',
                 ]);
             }
             else
@@ -133,7 +133,6 @@ trait WorkerGenerator
                     if (!FileStorage::disk("spaces")->exists($cloudfile))
                     {
                         JobTrace::where('id', $tracejob->id)->first()->update([
-                            'explanation' => 'Please wait a moment, file is under sync to CDN servers.',
                             'log' => 'Please wait a moment, file is under sync to CDN servers.',
                             'status' => 'PROCESSING',
                         ]);
@@ -147,7 +146,6 @@ trait WorkerGenerator
                                 File::delete(public_path($localfile));
                                 $cloudurl = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($cloudfile));
                                 JobTrace::where('id', $tracejob->id)->first()->update([
-                                    'explanation' => 'File archived on CDN servers.',
                                     'log' => 'File archived on CDN servers.',
                                     'url' => $cloudurl,
                                     'status' => 'DONE',
@@ -156,7 +154,6 @@ trait WorkerGenerator
                             else
                             {
                                 JobTrace::where('id', $tracejob->id)->first()->update([
-                                    'explanation' => 'Failed sync to CDN servers.',
                                     'log' => 'Failed sync to CDN servers.',
                                     'status' => 'DONE',
                                 ]);
@@ -165,7 +162,6 @@ trait WorkerGenerator
                         catch (Exception $ex)
                         {
                             JobTrace::where('id', $tracejob->id)->first()->update([
-                                'explanation' => $ex->getMessage(),
                                 'log' => $ex->getMessage(),
                                 'status' => 'FAILED',
                             ]);
@@ -176,7 +172,6 @@ trait WorkerGenerator
                         File::delete(public_path($localfile));
                         $cloudurl = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($cloudfile));
                         JobTrace::where('id', $tracejob->id)->first()->update([
-                            'explanation' => 'File archived on CDN servers.',
                             'log' => 'File archived on CDN servers.',
                             'url' => $cloudurl,
                             'status' => 'DONE',
@@ -189,7 +184,7 @@ trait WorkerGenerator
                     {
                         JobTrace::where('id', $tracejob->id)->first()->update([
                             'status' => 'DELETED',
-                            'log' => 'File may no longer be available due to an export error or the file has expired. (WebtoolExportSyncFiles_FErr_01)',
+                            'log' => 'File may no longer be available due to an export error or the file has expired. ('.__FUNCTION__.'_FErr_01)',
                         ]);
                     }
                 }
