@@ -17,7 +17,7 @@ trait WorkerGenerator
     public function WebtoolDoWorker()
     {
         $_[] = "webtool-worker-sleep-cooldown-".hash("sha256", time());
-        $_[] = $this->call("queue:work", ["--once" => null, "--tries" => Common::GetEnv('WORKER_TRIES', 3), "--timeout" => Common::GetEnv('WORKER_TIMEOUT', 1200), "--memory" => Common::GetEnv('WORKER_MEMORY', 4096), "--delay" => Common::GetEnv('WORKER_DELAY', 3), "--sleep" => Common::GetEnv('WORKER_SLEEP', 3), "--no-ansi" => null, "--no-interaction" => null, "-vvv" => null]);
+        $_[] = $this->call("queue:work", ["--once" => null, "--tries" => Common::GetEnv('WORKER_TRIES', 1), "--timeout" => Common::GetEnv('WORKER_TIMEOUT', 900), "--memory" => Common::GetEnv('WORKER_MEMORY', 2048), "--delay" => Common::GetEnv('WORKER_DELAY', 15), "--sleep" => Common::GetEnv('WORKER_SLEEP', 5), "--no-ansi" => null, "--no-interaction" => null, "-vvv" => null]);
         $_[] = $this->WebtoolValidateSyncFiles();
         $_[] = $this->WebtoolDoExportSyncFiles();
     }
