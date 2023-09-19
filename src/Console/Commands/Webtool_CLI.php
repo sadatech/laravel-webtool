@@ -2,8 +2,6 @@
 namespace Sadatech\Webtool\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Artisan;
 use Sadatech\Webtool\Console\Traits\WorkerGenerator;
 use Sadatech\Webtool\Console\Traits\CommonCLI;
 
