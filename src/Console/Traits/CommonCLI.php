@@ -10,6 +10,6 @@ trait CommonCLI
 {
     public function WebtoolJobList()
     {
-        $this->line(DB::table('jobs')->whereNull('reserved_at'));
+        $this->line(json_encode(DB::table('jobs')->whereNull('reserved_at')));
     }
 }
