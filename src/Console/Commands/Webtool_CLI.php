@@ -2,6 +2,7 @@
 namespace Sadatech\Webtool\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Sadatech\Webtool\Console\Traits\WorkerGenerator;
 
@@ -46,9 +47,9 @@ class Webtool_CLI extends Command
         {
             $this->WebtoolDoWorker();
         }
-        elseif ($_command_name == "job_count")
+        elseif ($_command_name == "jobs")
         {
-            //
+            $this->WebtoolJobList();
         }
         else
         {
