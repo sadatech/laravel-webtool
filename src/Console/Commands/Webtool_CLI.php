@@ -5,10 +5,11 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Sadatech\Webtool\Console\Traits\WorkerGenerator;
+use Sadatech\Webtool\Console\Traits\CommonCLI;
 
 class Webtool_CLI extends Command
 {
-    use WorkerGenerator;
+    use WorkerGenerator, CommonCLI;
 
     /**
      * The name and signature of the console command.
