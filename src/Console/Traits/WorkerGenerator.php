@@ -181,51 +181,47 @@ trait WorkerGenerator
                 {
                     if ($tracejob->results)
                     {
-                        JobTrace::where('id', $tracejob->id)->first()->update([
-                            'explanation' => 'Please wait a moment, file is under sync to CDN servers.',
-                            'log' => 'Please wait a moment, file is under sync to CDN servers.',
-                            'status' => 'PROCESSING',
-                        ]);
+                        $trace_url = parse_url($tracejob->results);
 
-                        // fetch node file
-                        $nodefile = $tracejob->results;
-                        $nodefile = str_replace('https://dataproc.sadata.id/', '/', $nodefile);
-                        $nodefile = str_replace('https','---123---', str_replace('http','---123---', $nodefile));
-                        $nodefile = str_replace('---123---', 'https', $nodefile);
-                        $nodefile = str_replace(public_path(''), null, $nodefile);
-                        $nodefile = str_replace('files/exports/'.Common::GetConfig("database.connections.mysql.database"), null, $nodefile);
-                        $cloudfile = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$nodefile);
-
-                        // handler read file
-                        try
-                        {
-                            $filereader = file_get_contents($nodefile);
-                            if (FileStorage::disk("spaces")->put($cloudfile, $filereader, "public"))
-                            {
-                                $cloudurl = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($cloudfile));
-                                JobTrace::where('id', $tracejob->id)->first()->update([
-                                    'explanation' => 'File archived on CDN servers.',
-                                    'log' => 'File archived on CDN servers.',
-                                    'url' => $cloudurl,
-                                    'status' => 'DONE',
-                                ]);
-                            }
-                            else
-                            {
-                                JobTrace::where('id', $tracejob->id)->first()->update([
-                                    'explanation' => 'Failed sync to CDN servers.',
-                                    'log' => 'Failed sync to CDN servers.',
-                                    'status' => 'DONE',
-                                ]);
-                            }
-                        }
-                        catch (Exception $ex)
+                        if ($trace_url['host'] == "dataproc.sadata.id")
                         {
                             JobTrace::where('id', $tracejob->id)->first()->update([
-                                'explanation' => $ex->getMessage(),
-                                'log' => $ex->getMessage(),
-                                'status' => 'FAILED',
+                                'explanation' => 'Please wait a moment, file is under sync to CDN servers.',
+                                'log' => 'Please wait a moment, file is under sync to CDN servers.',
+                                'status' => 'PROCESSING',
                             ]);
+    
+                            // handler read file
+                            try
+                            {
+                                $filereader = file_get_contents($tracejob->results);
+                                if (FileStorage::disk("spaces")->put($cloudfile, $filereader, "public"))
+                                {
+                                    $cloudurl = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($cloudfile));
+                                    JobTrace::where('id', $tracejob->id)->first()->update([
+                                        'explanation' => 'File archived on CDN servers.',
+                                        'log' => 'File archived on CDN servers.',
+                                        'url' => $cloudurl,
+                                        'status' => 'DONE',
+                                    ]);
+                                }
+                                else
+                                {
+                                    JobTrace::where('id', $tracejob->id)->first()->update([
+                                        'explanation' => 'Failed sync to CDN servers.',
+                                        'log' => 'Failed sync to CDN servers.',
+                                        'status' => 'DONE',
+                                    ]);
+                                }
+                            }
+                            catch (Exception $ex)
+                            {
+                                JobTrace::where('id', $tracejob->id)->first()->update([
+                                    'explanation' => $ex->getMessage(),
+                                    'log' => $ex->getMessage(),
+                                    'status' => 'FAILED',
+                                ]);
+                            }
                         }
                     }
                     else
