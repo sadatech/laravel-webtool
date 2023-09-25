@@ -179,7 +179,7 @@ trait WorkerGenerator
                 }
                 else
                 {
-                    if ($tracejob->result)
+                    if ($tracejob->results)
                     {
                         JobTrace::where('id', $tracejob->id)->first()->update([
                             'explanation' => 'Please wait a moment, file is under sync to CDN servers.',
@@ -232,7 +232,7 @@ trait WorkerGenerator
                     if (!$tracejob->url)
                     {
                         JobTrace::where('id', $tracejob->id)->first()->update([
-                            'status' => 'FAILED',
+                            'status' => 'DELETED',
                             'log' => 'File may no longer be available due to an export error or the file has expired. ('.__FUNCTION__.'_FErr_01)',
                         ]);
                     }
