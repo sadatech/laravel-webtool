@@ -190,8 +190,6 @@ trait WorkerGenerator
                         // fetch node file
                         $nodefile = $tracejob->results;
                         $nodefile = str_replace('https://dataproc.sadata.id/', '/', $nodefile);
-                        $nodefile = str_replace('https','---123---', str_replace('http','---123---', $nodefile));
-                        $nodefile = str_replace('---123---', 'https', $nodefile);
                         $nodefile = str_replace(public_path(''), null, $nodefile);
                         $nodefile = str_replace('files/exports/'.Common::GetConfig("database.connections.mysql.database"), null, $nodefile);
                         $cloudfile = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$nodefile);
