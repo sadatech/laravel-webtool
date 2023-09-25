@@ -179,7 +179,7 @@ trait WorkerGenerator
                 }
                 else
                 {
-                    if ($tracejob->result)
+                    if ($tracejob->results)
                     {
                         JobTrace::where('id', $tracejob->id)->first()->update([
                             'explanation' => 'Please wait a moment, file is under sync to CDN servers.',
