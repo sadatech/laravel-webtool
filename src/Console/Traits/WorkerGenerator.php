@@ -232,7 +232,7 @@ trait WorkerGenerator
                     if (!$tracejob->url)
                     {
                         JobTrace::where('id', $tracejob->id)->first()->update([
-                            'status' => 'DELETED',
+                            'status' => 'FAILED',
                             'log' => 'File may no longer be available due to an export error or the file has expired. ('.__FUNCTION__.'_FErr_01)',
                         ]);
                     }
