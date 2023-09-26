@@ -42,8 +42,6 @@ trait WorkerGenerator
             $ndate = Carbon::now()->timestamp;
             $mdate = Carbon::parse($tracejob->created_at)->addDays(Common::GetEnv('EXPORT_EXPIRED_DAYS', 3))->timestamp;
             $localfile = str_replace('https://'.request()->getHost().'/', '/', $tracejob->results);
-            $localfile = str_replace('https','---123---', str_replace('http','---123---', $localfile));
-            $localfile = str_replace('---123---', 'https', $localfile);
             $localfile = str_replace(public_path(''), null, $localfile);
             $cloudfile = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$localfile);
             $hashfile  = hash('md5', $tracejob->results);
@@ -105,8 +103,6 @@ trait WorkerGenerator
             $ndate = Carbon::now()->timestamp;
             $mdate = Carbon::parse($tracejob->created_at)->addDays(Common::GetEnv('EXPORT_EXPIRED_DAYS', 3))->timestamp;
             $localfile = str_replace('https://'.request()->getHost().'/', '/', $tracejob->results);
-            $localfile = str_replace('https','---123---', str_replace('http','---123---', $localfile));
-            $localfile = str_replace('---123---', 'https', $localfile);
             $localfile = str_replace(public_path(''), null, $localfile);
             $cloudfile = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$localfile);
             $hashfile  = hash('md5', $tracejob->results);
@@ -196,6 +192,8 @@ trait WorkerGenerator
                         try
                         {
                             $filereader = file_get_contents($tracejob->results);
+                            $localfile = str_replace('https://dataproc.sadata.id/', '/', $tracejob->results);
+                            $cloudfile = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$localfile);
                             if (FileStorage::disk("spaces")->put($cloudfile, $filereader, "public"))
                             {
                                 $this->MakeRequestNode('POST', 'remove', ['hash' => $tracejob_hash]);
