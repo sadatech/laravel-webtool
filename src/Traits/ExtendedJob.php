@@ -13,7 +13,7 @@ trait ExtendedJob
         $http_build_query = $build_query;
         $http_client = new HTTP_Client;
 
-        $http_response = $http_client->request($http_scheme, $http_endpoint, $http_build_query);
+        $http_response = $http_client->request($http_scheme, $http_endpoint, ['form_params' => $http_build_query]);
 
         return $http_response;
     }
