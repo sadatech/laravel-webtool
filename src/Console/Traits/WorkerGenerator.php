@@ -6,9 +6,12 @@ use Carbon\Carbon;
 use Sadatech\Webtool\Helpers\Common;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage as FileStorage;
+use Sadatech\Webtool\Traits\ExtendedJob;
 
 trait WorkerGenerator
 {
+    use ExtendedJob;
+
     /**
      * Generate Export Files
      * 
@@ -181,6 +184,8 @@ trait WorkerGenerator
                 {
                     if ($tracejob->results)
                     {
+                        $tracejob_hash = $tracejob->log; // temporary hash
+
                         JobTrace::where('id', $tracejob->id)->first()->update([
                             'explanation' => 'Please wait a moment, file is under sync to CDN servers.',
                             'log' => 'Please wait a moment, file is under sync to CDN servers.',
@@ -193,6 +198,7 @@ trait WorkerGenerator
                             $filereader = file_get_contents($tracejob->results);
                             if (FileStorage::disk("spaces")->put($cloudfile, $filereader, "public"))
                             {
+                                $this->MakeRequestNode('POST', 'remove', ['hash' => $tracejob_hash]);
                                 $cloudurl = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($cloudfile));
                                 JobTrace::where('id', $tracejob->id)->first()->update([
                                     'explanation' => 'File archived on CDN servers.',
