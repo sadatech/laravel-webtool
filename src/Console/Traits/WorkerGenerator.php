@@ -181,42 +181,43 @@ trait WorkerGenerator
                 {
                     if ($tracejob->results)
                     {
-                        JobTrace::where('id', $tracejob->id)->first()->update([
-                            'explanation' => 'Please wait a moment, file is under sync to CDN servers.',
-                            'log' => 'Please wait a moment, file is under sync to CDN servers.',
-                            'status' => 'PROCESSING',
-                        ]);
-
-                        // handler read file
-                        try
-                        {
-                            $filereader = file_get_contents($tracejob->results);
-                            if (FileStorage::disk("spaces")->put($cloudfile, $filereader, "public"))
-                            {
-                                $cloudurl = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($cloudfile));
-                                JobTrace::where('id', $tracejob->id)->first()->update([
-                                    'explanation' => 'File archived on CDN servers.',
-                                    'log' => 'File archived on CDN servers.',
-                                    'url' => $cloudurl,
-                                    'status' => 'DONE',
-                                ]);
-                            }
-                            else
-                            {
-                                JobTrace::where('id', $tracejob->id)->first()->update([
-                                    'explanation' => 'Failed sync to CDN servers.',
-                                    'log' => 'Failed sync to CDN servers.',
-                                    'status' => 'DONE',
-                                ]);
-                            }
-                        }
-                        catch (Exception $ex)
-                        {
                             JobTrace::where('id', $tracejob->id)->first()->update([
-                                'explanation' => $ex->getMessage(),
-                                'log' => $ex->getMessage(),
-                                'status' => 'FAILED',
+                                'explanation' => 'Please wait a moment, file is under sync to CDN servers.',
+                                'log' => 'Please wait a moment, file is under sync to CDN servers.',
+                                'status' => 'PROCESSING',
                             ]);
+    
+                            // handler read file
+                            try
+                            {
+                                $filereader = file_get_contents($tracejob->results);
+                                if (FileStorage::disk("spaces")->put($cloudfile, $filereader, "public"))
+                                {
+                                    $cloudurl = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($cloudfile));
+                                    JobTrace::where('id', $tracejob->id)->first()->update([
+                                        'explanation' => 'File archived on CDN servers.',
+                                        'log' => 'File archived on CDN servers.',
+                                        'url' => $cloudurl,
+                                        'status' => 'DONE',
+                                    ]);
+                                }
+                                else
+                                {
+                                    JobTrace::where('id', $tracejob->id)->first()->update([
+                                        'explanation' => 'Failed sync to CDN servers.',
+                                        'log' => 'Failed sync to CDN servers.',
+                                        'status' => 'DONE',
+                                    ]);
+                                }
+                            }
+                            catch (Exception $ex)
+                            {
+                                JobTrace::where('id', $tracejob->id)->first()->update([
+                                    'explanation' => $ex->getMessage(),
+                                    'log' => $ex->getMessage(),
+                                    'status' => 'FAILED',
+                                ]);
+                            }
                         }
                     }
                     else
