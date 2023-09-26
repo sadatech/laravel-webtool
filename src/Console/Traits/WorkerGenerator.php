@@ -178,7 +178,7 @@ trait WorkerGenerator
                 }
                 else
                 {
-                    if ($tracejob->results)
+                    if ($tracejob->results && !$tracejob->url)
                     {
                         $tracejob_hash = $tracejob->log; // temporary hash
 
