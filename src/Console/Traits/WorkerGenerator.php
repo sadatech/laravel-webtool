@@ -196,7 +196,7 @@ trait WorkerGenerator
                             $cloudfile = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$localfile);
                             if (FileStorage::disk("spaces")->put($cloudfile, $filereader, "public"))
                             {
-                                $this->MakeRequestNode('POST', 'remove', ['hash' => $tracejob_hash]);
+                                $this->MakeRequestNode('POST', 'remove', ['filename' => basename($cloudfile), 'hash' => $tracejob_hash]);
                                 $cloudurl = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($cloudfile));
                                 JobTrace::where('id', $tracejob->id)->first()->update([
                                     'explanation' => 'File archived on CDN servers.',
