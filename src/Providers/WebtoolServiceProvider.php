@@ -4,6 +4,7 @@ namespace Sadatech\Webtool\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Sadatech\Webtool\Console\Kernel as WebtoolConsoleKernel;
+use Sadatech\Webtool\Http\Middleware\WebtoolMiddleware;
 
 class WebtoolServiceProvider extends ServiceProvider
 {
@@ -31,7 +32,7 @@ class WebtoolServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(Router $router)
     {
         // parent::boot();
 
@@ -41,8 +42,10 @@ class WebtoolServiceProvider extends ServiceProvider
         }
         else
         {
-            $this->loadViewsFrom($this->basepath('/dist/resources/views'), $this->namespace);
+            // register middleware
+            $router->middlewareGroup('WebtoolMiddleware', [WebtoolMiddleware::class]);
 
+            $this->loadViewsFrom($this->basepath('/dist/resources/views'), $this->namespace);
             $this->webtoolMapRoutes();
         }
 
@@ -68,7 +71,7 @@ class WebtoolServiceProvider extends ServiceProvider
     protected function webtoolMapRoutes()
     {
         Route::prefix('webtool')
-             ->middleware('web')
+             ->middleware(['web', 'WebtoolMiddleware'])
              ->namespace($this->namespace)
              ->as('webtool.')
              ->group($this->basepath('/dist/routes/webtool.php'));

@@ -9,6 +9,11 @@
 */
 
 /**
+ * Healthcheck URL
+ */
+Route::get('/healthcheck', 'WebtoolController@healthcheckResponse')->name('healthcheck');
+
+/**
  * Download Generate URL
  */
 Route::post('/download/generate/{uid?}', 'WebtoolController@downloadGenerate')->name('download.generate');
