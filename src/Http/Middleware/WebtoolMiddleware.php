@@ -1,5 +1,5 @@
 <?php
-namespace Sadatech\Webtool\Http\Middlewares;
+namespace Sadatech\Webtool\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
