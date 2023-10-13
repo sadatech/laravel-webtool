@@ -10,8 +10,9 @@ use Carbon\Carbon;
  * Package trait
  */
 use Sadatech\Webtool\Http\Traits\DownloadGenerate;
+use Sadatech\Webtool\Http\Traits\Healthcheck;
 
 class WebtoolController extends Controller
 {
-    use DownloadGenerate;
+    use DownloadGenerate, Healthcheck;
 }
