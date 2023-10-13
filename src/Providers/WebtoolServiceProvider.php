@@ -1,6 +1,7 @@
 <?php
 namespace Sadatech\Webtool\Providers;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Sadatech\Webtool\Console\Kernel as WebtoolConsoleKernel;
