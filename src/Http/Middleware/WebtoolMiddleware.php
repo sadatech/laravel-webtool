@@ -18,8 +18,8 @@ class WebtoolMiddleware
     public function handle($request, Closure $next)
     {
         $response = $next($request);
-        $response->header('X-Laravel-Webtool-Version', Application::LARAVEL_WEBTOOL_VERSION);
-        $response->header('X-Laravel-Webtool-Dummy', '%%%');
+        // $response->header('X-Laravel-Webtool-Version', Application::LARAVEL_WEBTOOL_VERSION);
+        // $response->header('X-Laravel-Webtool-Dummy', '%%%');
         return $response;
     }
 }
