@@ -7,6 +7,8 @@ use Carbon\Carbon;
 use Sadatech\Webtool\Helpers\Common;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage as FileStorage;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Sadatech\Webtool\Traits\ExtendedJob;
 
 trait WorkerGenerator
@@ -20,10 +22,33 @@ trait WorkerGenerator
      */
     public function WebtoolDoWorker()
     {
-        $_[] = $this->call("queue:work", ["--once" => null, "--tries" => Common::GetEnv('WORKER_TRIES', 1), "--timeout" => Common::GetEnv('WORKER_TIMEOUT', 900), "--memory" => Common::GetEnv('WORKER_MEMORY', 8192), "--delay" => Common::GetEnv('WORKER_DELAY', 15), "--sleep" => Common::GetEnv('WORKER_SLEEP', 5), "--no-ansi" => null, "--no-interaction" => null, "-vvv" => null]);
-
-        // Run background command validate run by microservice.
+        $_[] = $this->ExecuteArtisanQueue();
         $_[] = $this->ValidateTracejobAfterQueue();
+    }
+
+    /**
+     * Call artisan command by total jobs
+     * 
+     * @return void
+     */
+    private function ExecuteArtisanQueue()
+    {
+        if (Schema::hasTable('jobs'))
+        {
+            $job_totals = DB::table('jobs')->whereNull('reserved_at')->count();
+
+            if ($job_totals > 0)
+            {
+                for ($i = 0; $i < $job_totals; $i++)
+                {
+                    $this->call("queue:work", ["--once" => null, "--tries" => Common::GetEnv('WORKER_TRIES', 1), "--timeout" => Common::GetEnv('WORKER_TIMEOUT', 900), "--memory" => Common::GetEnv('WORKER_MEMORY', 8192), "--delay" => Common::GetEnv('WORKER_DELAY', 15), "--sleep" => Common::GetEnv('WORKER_SLEEP', 5), "--no-ansi" => null, "--no-interaction" => null, "-vvv" => null]);
+                }
+            }
+            else
+            {
+                $this->call("queue:work", ["--once" => null, "--tries" => Common::GetEnv('WORKER_TRIES', 1), "--timeout" => Common::GetEnv('WORKER_TIMEOUT', 900), "--memory" => Common::GetEnv('WORKER_MEMORY', 8192), "--delay" => Common::GetEnv('WORKER_DELAY', 15), "--sleep" => Common::GetEnv('WORKER_SLEEP', 5), "--no-ansi" => null, "--no-interaction" => null, "-vvv" => null]);
+            }
+        }
     }
 
     /**
