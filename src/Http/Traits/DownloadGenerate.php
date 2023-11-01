@@ -65,14 +65,17 @@ trait DownloadGenerate
                         }
                         else
                         {
-                            header("Content-disposition: attachment; filename=\"".$download['s3name']."\"");
-                            header("Content-Length: ".$download['s3size']);
-                            header("Content-Type: ".$download['s3mime']);
-                            header("Pragma: public");
-                            header("Expires: 0");
+                            // header("Content-disposition: attachment; filename=\"".."\"");
+                            // header("Content-Length: ".$download['s3size']);
+                            // header("Content-Type: ".$download['s3mime']);
+                            // header("Pragma: public");
+                            // header("Expires: 0");
     
                             // return FileStorage::disk("spaces")->get($download['path']);
-                            return Common::FetchGetContent(FileStorage::disk("spaces")->url($download['path']));
+                            // return Common::FetchGetContent(FileStorage::disk("spaces")->url($download['path']));
+                            return response()->streamDownload(function () use ($download) {
+                                echo Common::FetchGetContent(FileStorage::disk("spaces")->url($download['path']));
+                            }, $download['s3name']);
                         }
                     }
                     else
