@@ -56,6 +56,7 @@ trait WorkerGenerator
                         'explanation' => NULL,
                         'log'         => NULL,
                         'url'         => $stream_cloud_url,
+                        'other_notes' => 'File archived on CDN servers.',
                         'status'      => 'DONE',
                     ]);
 
