@@ -71,7 +71,8 @@ trait DownloadGenerate
                             header("Pragma: public");
                             header("Expires: 0");
     
-                            return FileStorage::disk("spaces")->get($download['path']);
+                            // return FileStorage::disk("spaces")->get($download['path']);
+                            return Common::FetchGetContent(FileStorage::disk("spaces")->url($download['path']));
                         }
                     }
                     else
