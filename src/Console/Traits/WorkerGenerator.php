@@ -244,6 +244,8 @@ trait WorkerGenerator
 
         foreach ($jobtraces as $tracejob)
         {
+            $tracejob_hash = $tracejob->log;
+
             try
             {
                 $filereader = Common::curl_get_contents($tracejob->results);
