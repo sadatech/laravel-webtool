@@ -103,20 +103,36 @@ class Common
         }
     }
 
-    public static function FetchGetContent($url)
+    public static function FetchGetContent($url, $http_code = false)
     {
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        $data = curl_exec($ch);
-        if (curl_errno($ch))
+        if(!$url || !is_string($url) || ! preg_match('/^http(s)?:\/\/[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(\/.*)?$/i', $url))
         {
-            throw new Exception('Failed to execute CURL operations.');
+            return false;
         }
-        curl_close($ch);
+        else
+        {
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            $data = curl_exec($ch);
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if (curl_errno($ch))
+            {
+                throw new Exception('Failed to execute CURL operations.');
+            }
+            curl_close($ch);
+    
+            if (!$http_code)
+            {
+                return $data;
+            }
+            else
+            {
+                return ['data' => $data, 'http_code' => $httpcode];
+            }
+        }
 
-        return $data;
     }
 }

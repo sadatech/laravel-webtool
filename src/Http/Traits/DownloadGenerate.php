@@ -5,6 +5,7 @@ use App\JobTrace;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage as FileStorage;
+use Illuminate\Support\Facades\Response;
 use Sadatech\Webtool\Helpers\Common;
 use Sadatech\Webtool\Helpers\Encryptor;
 
@@ -59,24 +60,37 @@ trait DownloadGenerate
                         $download['s3size'] = FileStorage::disk("spaces")->size($download['path']);
                         $download['s3mime'] = FileStorage::disk("spaces")->mimeType($download['path']);
     
-                        if ($download['s3size'] > 512606337)
+                        // if ($download['s3size'] > 512606337)
+                        // {
+                        //     return redirect()->away($download['url']);
+                        // }
+                        // else
+                        // {
+                        $feth_space_data = Common::FetchGetContent(FileStorage::disk("spaces")->url($download['path']), true);
+
+                        if ($feth_space_data['http_code'] !== 200)
                         {
-                            return redirect()->away($download['url']);
+                            $download['trace']->update([
+                                'status'  => 'DELETED',
+                                'results' => NULL,
+                                'url'     => NULL,
+                                'log'     => 'File may no longer be available due to an export error.',
+                            ]);
+
+                            return redirect()->back()->withErrors(['message' => 'File may no longer be available due to an export error.']);
                         }
                         else
                         {
-                            // header("Content-disposition: attachment; filename=\"".."\"");
-                            // header("Content-Length: ".$download['s3size']);
-                            // header("Content-Type: ".$download['s3mime']);
-                            // header("Pragma: public");
-                            // header("Expires: 0");
-    
-                            // return FileStorage::disk("spaces")->get($download['path']);
-                            // return Common::FetchGetContent(FileStorage::disk("spaces")->url($download['path']));
-                            return response()->streamDownload(function () use ($download) {
-                                echo Common::FetchGetContent(FileStorage::disk("spaces")->url($download['path']));
-                            }, $download['s3name']);
+                            return Response::make($feth_space_data['data'], '200', array(
+                                'Content-Type' => 'application/octet-stream',
+                                'Content-Disposition' => 'attachment; filename="'.$download['s3name'].'"',
+                                'Content-Length' => $download['s3size'],
+                                'Content-Type' => $download['s3mime'],
+                                'Pragma' => 'public',
+                                'Expires' => 0,
+                            ));
                         }
+                        // }
                     }
                     else
                     {
