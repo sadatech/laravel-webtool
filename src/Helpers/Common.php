@@ -20,6 +20,40 @@ class Common
 
     public static function GenerateActionLink($item, $path)
     {
+        $action['html'] = '';
+        $action['url']  = (new Encryptor)->Make(json_encode(['id' => $item->id, 'location' => $item->url]));
+
+        // validate if done status
+        if ($item->status == "DONE")
+        {
+            // validate if empty url
+            if (empty($item->url))
+            {
+                $action['html'] .= "
+                <form method='post' action=''>
+                    <button type='button' style='width: 80%;' class='btn btn-sm btn-success btn-square disabled' disabled ><i class='fa fa-spinner fa-spin'></i></button>
+                </form>
+                ";
+            }
+            else
+            {
+                $action['html'] .= "
+                <form method='post' action='".route('webtool.download.generate', $action['url'])."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
+                    <button type='submit' style='width: 80%;' class='btn btn-sm btn-success btn-square'><i class='fa fa-spinner fa-spin'></i></button>
+                </form>
+                ";
+            }
+        }
+        else
+        {
+            $action['html'] .= "";
+        }
+
+        return $action['html'];
+    }
+
+    public static function _GenerateActionLink($item, $path)
+    {
         $action['url']  = str_replace('http://localhost/', asset(''), $item->results);
         $action['path'] = is_null($path) ? $item->results : ("/export/report/". $path . basename(str_replace('---123---', 'https', str_replace('https','---123---', str_replace('http','---123---', $action['url'])))));
         $action['url']  = (new Encryptor)->Make(json_encode(['id' => $item->id, 'location' => $action['path']]));
