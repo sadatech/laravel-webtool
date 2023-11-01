@@ -44,7 +44,7 @@ class WebtoolServiceProvider extends ServiceProvider
         else
         {
             // register middleware
-            $router->middlewareGroup('WebtoolMiddleware', [WebtoolMiddleware::class]);
+            // $router->middlewareGroup('WebtoolMiddleware', [WebtoolMiddleware::class]);
 
             $this->loadViewsFrom($this->basepath('/dist/resources/views'), $this->namespace);
             $this->webtoolMapRoutes();
@@ -72,7 +72,7 @@ class WebtoolServiceProvider extends ServiceProvider
     protected function webtoolMapRoutes()
     {
         Route::prefix('webtool')
-             ->middleware(['web', 'WebtoolMiddleware'])
+             ->middleware(['web'])
              ->namespace($this->namespace)
              ->as('webtool.')
              ->group($this->basepath('/dist/routes/webtool.php'));
