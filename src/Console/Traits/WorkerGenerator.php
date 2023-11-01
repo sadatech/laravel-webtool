@@ -190,7 +190,7 @@ trait WorkerGenerator
                         // handler read file
                         try
                         {
-                            $filereader = file_get_contents($tracejob->results);
+                            $filereader = Common::curl_get_contents($tracejob->results);
                             $localfile = str_replace('https://dataproc.sadata.id/', '/', $tracejob->results);
                             $cloudfile = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$localfile);
                             if (FileStorage::disk("spaces")->put($cloudfile, $filereader, "public"))
