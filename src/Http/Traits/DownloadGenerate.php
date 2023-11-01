@@ -20,6 +20,19 @@ trait DownloadGenerate
         // get status from job_trace table
         $download['trace'] = JobTrace::whereId($download['id'])->first();
 
+        return response()->json($download);
+    }
+
+    public function _downloadGenerate($uid)
+    {
+        // get token uid
+        $download['pkg'] = json_decode((new Encryptor)->Disassemble($uid));
+        $download['id']  = $download['pkg']->id;
+        $download['url'] = $download['pkg']->location;
+
+        // get status from job_trace table
+        $download['trace'] = JobTrace::whereId($download['id'])->first();
+
         // set validate expired time
         $download['time_start'] = Carbon::parse($download['trace']->created_at)->addDays(5)->timestamp;
         $download['time_end']   = Carbon::now()->timestamp;
