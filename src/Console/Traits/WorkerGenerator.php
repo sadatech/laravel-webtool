@@ -45,7 +45,7 @@ trait WorkerGenerator
                 $stream_cloud_path  = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$stream_local_path);
 
                 // upload to spaces
-                if (FileStorage::disk("spaces")->put($cloudfile, $filereader, "public"))
+                if (FileStorage::disk("spaces")->put($stream_cloud_path, $stream_export_file, "public"))
                 {
                     $stream_cloud_url = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($stream_cloud_path));
 
