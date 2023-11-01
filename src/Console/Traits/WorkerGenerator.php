@@ -41,7 +41,9 @@ trait WorkerGenerator
             {
                 // define variables
                 $stream_export_file = Common::FetchGetContent($job_trace->results);
-                $stream_local_path  = str_replace('https://dataproc.sadata.id/', '/', $job_trace->results);
+                $stream_local_path  = str_replace('https://'.request()->getHost().'/', '/', $job_trace->results);
+                $stream_local_path  = str_replace(public_path(''), null, $stream_local_path);
+                $stream_local_path  = str_replace('https://dataproc.sadata.id/', '/', $stream_local_path);
                 $stream_cloud_path  = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$stream_local_path);
 
                 // upload to spaces
@@ -51,7 +53,6 @@ trait WorkerGenerator
 
                     // update job traces
                     JobTrace::where('id', $job_trace->id)->first()->update([
-                        'results'     => NULL,
                         'explanation' => NULL,
                         'log'         => NULL,
                         'url'         => $stream_cloud_url,
