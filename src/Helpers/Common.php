@@ -69,7 +69,7 @@ class Common
         }
     }
 
-    public static function curl_get_contents($url)
+    public static function FetchGetContent($url)
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
