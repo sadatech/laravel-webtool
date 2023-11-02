@@ -176,7 +176,7 @@ trait WorkerGenerator
                     // validate exists file
                     if (FileStorage::disk('spaces')->exists($stream_cloud_path))
                     {
-                        FileStorage::disk('spaces')->exists($stream_cloud_path);
+                        FileStorage::disk('spaces')->delete($stream_cloud_path);
                     }
                     if (File::exists(public_path($stream_local_path)))
                     {
