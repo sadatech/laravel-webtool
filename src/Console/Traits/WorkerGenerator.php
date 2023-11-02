@@ -25,6 +25,7 @@ trait WorkerGenerator
         $_[] = $this->ExecuteArtisanQueue();
         $_[] = $this->ValidateTracejobDoneOnly();
         $_[] = $this->ValidateTracejobAfterQueue();
+        $_[] = $this->ValidateTracejobExpire();
     }
 
     /**
@@ -150,11 +151,27 @@ trait WorkerGenerator
     }
 
     /**
-     * Validate TraceJob after 5 day (expired)
+     * Validate TraceJob after 3 day (expired)
      * 
      * @return void
      */
     private function ValidateTracejobExpire()
-    {}
+    {
+        $job_traces = JobTrace::whereIn('status', ['DONE'])->whereNull('results')->whereNotNull('url')->orderByDesc('created_at')->get();
+
+        foreach ($job_traces as $job_trace)
+        {
+            try
+            {
+
+            }
+            catch (Exception $exception)
+            {
+                JobTrace::where('id', $job_trace->id)->first()->update([
+                    'log' => $exception->getMessage(),
+                ]);
+            }
+        }
+    }
 
 }
