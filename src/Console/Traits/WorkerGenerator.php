@@ -161,8 +161,34 @@ trait WorkerGenerator
 
         foreach ($job_traces as $job_trace)
         {
+            $stream_date_now  = Carbon::now()->timestamp;
+            $stream_date_file = Carbon::parse($job_trace->created_at)->addDays(Common::GetEnv('EXPORT_EXPIRED_DAYS', 3))->timestamp;
+
             try
             {
+                if ($stream_date_file < $stream_date_now)
+                {
+                    $stream_base_url   = urldecode($job_trace->url);
+                    $stream_parse_url  = parse_url($job_trace->url);
+                    $stream_cloud_path = str_replace($stream_parse_url['scheme'].'://'.$stream_parse_url['host'].'/', '/', $stream_base_url);
+                    $stream_local_path = str_replace('/export-data/'.str_replace('_', '-', Common::GetConfig('database.connections.mysql.database')), '', $stream_cloud_path);
+
+                    // validate exists file
+                    if (FileStorage::disk('spaces')->exists($stream_cloud_path))
+                    {
+                        FileStorage::disk('spaces')->exists($stream_cloud_path);
+                    }
+                    if (File::exists(public_path($stream_local_path)))
+                    {
+                        File::delete(public_path($stream_local_path));
+                    }
+
+                    JobTrace::where('id', $job_trace->id)->first()->update([
+                        'status' => 'DELETED',
+                        'log'    => 'File may no longer be available due file has expired.',
+                        'url'    => NULL,
+                    ]);
+                }
 
             }
             catch (Exception $exception)
@@ -173,5 +199,4 @@ trait WorkerGenerator
             }
         }
     }
-
 }
