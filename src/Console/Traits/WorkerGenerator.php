@@ -95,6 +95,7 @@ trait WorkerGenerator
                 $stream_local_path  = str_replace(public_path(''), null, $stream_local_path);
                 $stream_local_path  = str_replace('https://dataproc.sadata.id/', '/', $stream_local_path);
                 $stream_cloud_path  = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$stream_local_path);
+                $stream_local_url   = parse_url($job_trace->results);
 
                 // upload to spaces
                 if (FileStorage::disk("spaces")->put($stream_cloud_path, $stream_export_file, "public"))
@@ -111,8 +112,21 @@ trait WorkerGenerator
                         'status'      => 'DONE',
                     ]);
 
-                    // remove from node exporter
-                    $this->MakeRequestNode('POST', 'remove', ['filename' => basename($stream_cloud_path), 'hash' => md5($stream_cloud_path)]);
+                    // validate source & remove file
+                    if (isset($stream_local_url['host']))
+                    {
+                        if ($stream_local_url['host'] == 'dataproc.sadata.id')
+                        {
+                            $this->MakeRequestNode('POST', 'remove', ['filename' => basename($stream_cloud_path), 'hash' => md5($stream_cloud_path)]);
+                        }
+                        else
+                        {
+                            if (File::exists(public_path($stream_local_path)))
+                            {
+                                File::delete(public_path($stream_local_path));
+                            }
+                        }
+                    }
                 }
                 else
                 {
