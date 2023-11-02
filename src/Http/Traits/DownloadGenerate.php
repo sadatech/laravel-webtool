@@ -61,11 +61,6 @@ trait DownloadGenerate
                         $download['s3mime'] = FileStorage::disk("spaces")->mimeType($download['path']);
     
                         // if ($download['s3size'] > 512606337)
-                        // {
-                        //     return redirect()->away($download['url']);
-                        // }
-                        // else
-                        // {
                         $feth_space_data = Common::FetchGetContent(FileStorage::disk("spaces")->url($download['path']), true);
 
                         if ($feth_space_data['http_code'] !== 200)
@@ -90,7 +85,6 @@ trait DownloadGenerate
                                 'Expires' => 0,
                             ));
                         }
-                        // }
                     }
                     else
                     {
