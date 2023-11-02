@@ -26,6 +26,17 @@ class Common
         // validate if done status
         if ($item->status == "DONE")
         {
+            // validate if empty results & url
+            if (empty($item->results) && empty($item->url))
+            {
+                $item->status = 'FAILED';
+                $item->log    = 'Failed to generate export file.';
+
+                $action['html'] .= "
+                <form method='post' action=''></form>
+                ";
+            }
+            else
             // validate if empty url
             if (empty($item->url))
             {
