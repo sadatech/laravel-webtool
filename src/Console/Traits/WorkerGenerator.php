@@ -58,7 +58,7 @@ trait WorkerGenerator
         {
             try
             {
-                JobTrace::where('id', $tracejob->id)->first()->update([
+                JobTrace::where('id', $job_trace->id)->first()->update([
                     'other_notes' => 'results & url is null',
                     'url'         => NULL,
                     'results'     => NULL,
@@ -116,7 +116,7 @@ trait WorkerGenerator
                 }
                 else
                 {
-                    JobTrace::where('id', $tracejob->id)->first()->update([
+                    JobTrace::where('id', $job_trace->id)->first()->update([
                         'status' => 'FAILED',
                         'log'    => 'Failed sync to CDN servers.',
                     ]);
