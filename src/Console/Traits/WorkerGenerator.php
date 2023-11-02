@@ -23,6 +23,7 @@ trait WorkerGenerator
     public function WebtoolDoWorker()
     {
         $_[] = $this->ExecuteArtisanQueue();
+        $_[] = $this->ValidateTracejobDoneOnly();
         $_[] = $this->ValidateTracejobAfterQueue();
     }
 
