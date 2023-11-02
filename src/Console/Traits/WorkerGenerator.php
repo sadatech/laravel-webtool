@@ -115,7 +115,7 @@ trait WorkerGenerator
                     // validate source & remove file
                     if (isset($stream_local_url['host']))
                     {
-                        if ($stream_local_url['host'] == 'dataproc.sadata.id')
+                        if ($stream_local_url['host'] == @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
                         {
                             $this->MakeRequestNode('POST', 'remove', ['filename' => basename($stream_cloud_path), 'hash' => md5($stream_cloud_path)]);
                         }
