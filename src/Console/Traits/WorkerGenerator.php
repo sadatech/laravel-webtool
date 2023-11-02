@@ -52,6 +52,37 @@ trait WorkerGenerator
     }
 
     /**
+     * Validate TraceJob Done Only
+     * 
+     * @return void
+     */
+    private function ValidateTracejobDoneOnly()
+    {
+        $job_traces = JobTrace::whereIn('status', ['DONE'])->whereNull('results')->whereNull('url')->orderByDesc('created_at')->get();
+
+        foreach ($job_traces as $job_trace)
+        {
+            try
+            {
+                JobTrace::where('id', $tracejob->id)->first()->update([
+                    'other_notes' => 'results & url is null',
+                    'url'         => NULL,
+                    'results'     => NULL,
+                    'status'      => 'FAILED',
+                    'log'         => 'Failed to generate export file.',
+                ]);
+            }
+            catch (Exception $exception)
+            {
+                JobTrace::where('id', $job_trace->id)->first()->update([
+                    'status' => 'FAILED',
+                    'log'    => $exception->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /**
      * Validate Tracejob After Queue
      * 
      * @return void
@@ -80,6 +111,7 @@ trait WorkerGenerator
                     JobTrace::where('id', $job_trace->id)->first()->update([
                         'explanation' => NULL,
                         'log'         => NULL,
+                        'results'     => NULL,
                         'url'         => $stream_cloud_url,
                         'other_notes' => 'File archived on CDN servers.',
                         'status'      => 'DONE',
