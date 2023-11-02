@@ -28,11 +28,15 @@ trait ExtendedJob
             }
             else
             {
+                $result = "No data found.";
+
                 $job_trace->update([
                     'status' => 'FAILED',
                     'log'    => 'Failed to export data (from node)',
                 ]);
             }
+
+            return $result;
         }
         else
         {
