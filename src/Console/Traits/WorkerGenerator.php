@@ -93,7 +93,10 @@ trait WorkerGenerator
                 // define variables
                 $stream_base_url    = $job_trace->results;
                 $stream_parse_url   = parse_url($stream_base_url);
-                $stream_base_url    = str_replace($stream_parse_url['host'], request()->getHost(), $job_trace->results);
+                if ($stream_parse_url['host'] !== @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
+                {
+                    $stream_base_url    = str_replace($stream_parse_url['host'], request()->getHost(), $job_trace->results);
+                }
                 $stream_export_file = Common::FetchGetContent($stream_base_url);
                 $stream_local_path  = str_replace('https://'.request()->getHost().'/', '/', $stream_base_url);
                 $stream_local_path  = str_replace(public_path(''), null, $stream_local_path);
