@@ -78,8 +78,12 @@ class Common
 
     public static function FetchGetContent($url, $http_code = false)
     {
-        $ch = curl_init($url);
+        $ch = curl_init();
+        $url_basename = basename($url);
+        curl_setopt($ch, CURLOPT_URL, str_replace($url_basename, rawurlencode($url_basename), $url));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
+        curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
