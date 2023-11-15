@@ -93,16 +93,27 @@ trait WorkerGenerator
                 // define variables
                 $stream_base_url    = $job_trace->results;
                 $stream_parse_url   = parse_url($stream_base_url);
-                if ($stream_parse_url['host'] !== @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
+                if (isset($stream_parse_url['scheme']))
                 {
-                    $stream_base_url    = str_replace($stream_parse_url['host'], request()->getHost(), $job_trace->results);
+                    if ($stream_parse_url['host'] !== @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
+                    {
+                        $stream_base_url = str_replace($stream_parse_url['host'], request()->getHost(), $job_trace->results);
+                    }
                 }
-                $stream_export_file = Common::FetchGetContent($stream_base_url);
+                else
+                {
+                    $stream_base_url = $stream_base_url;
+                }
                 $stream_local_path  = str_replace('https://'.request()->getHost().'/', '/', $stream_base_url);
                 $stream_local_path  = str_replace(public_path(''), null, $stream_local_path);
                 $stream_local_path  = str_replace('https://dataproc.sadata.id/', '/', $stream_local_path);
                 $stream_cloud_path  = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$stream_local_path);
                 $stream_local_url   = parse_url($stream_base_url);
+                if (!isset($stream_local_url['scheme']))
+                {
+                    $stream_base_url = 'http://'.request()->getHost().$stream_base_url;
+                }
+                $stream_export_file = Common::FetchGetContent($stream_base_url);
 
                 // upload to spaces
                 if (FileStorage::disk("spaces")->put($stream_cloud_path, $stream_export_file, "public"))
