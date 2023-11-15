@@ -111,7 +111,7 @@ trait WorkerGenerator
                 $stream_local_url   = parse_url($stream_base_url);
                 if (!isset($stream_local_url['scheme']))
                 {
-                    $stream_base_url = 'http://'.request()->getHost().$stream_base_url;
+                    $stream_base_url = 'http://'.request()->getHost().$stream_local_path;
                 }
                 $stream_export_file = Common::FetchGetContent($stream_base_url);
 
