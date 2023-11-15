@@ -77,10 +77,9 @@ trait DownloadGenerate
                         else
                         {
                             return Response::make($feth_space_data['data'], '200', array(
-                                'Content-Type' => 'application/octet-stream',
+                                'Content-Type' => $download['s3mime'],
                                 'Content-Disposition' => 'attachment; filename="'.$download['s3name'].'"',
                                 'Content-Length' => $download['s3size'],
-                                'Content-Type' => $download['s3mime'],
                                 'Pragma' => 'public',
                                 'Expires' => 0,
                             ));
