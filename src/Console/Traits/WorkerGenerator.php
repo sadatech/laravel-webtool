@@ -113,45 +113,60 @@ trait WorkerGenerator
                 {
                     $stream_base_url = 'http://'.request()->getHost().$stream_local_path;
                 }
-                $stream_export_file = Common::FetchGetContent($stream_base_url);
+                $stream_export_file = Common::FetchGetContent($stream_base_url, true);
 
-                // upload to spaces
-                if (FileStorage::disk("spaces")->put($stream_cloud_path, $stream_export_file, "public"))
-                {
-                    $stream_cloud_url = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($stream_cloud_path));
-
-                    // update job traces
-                    JobTrace::where('id', $job_trace->id)->first()->update([
-                        'explanation' => NULL,
-                        'log'         => NULL,
-                        'results'     => NULL,
-                        'url'         => rawurldecode($stream_cloud_url),
-                        'other_notes' => 'File archived on CDN servers.',
-                        'status'      => 'DONE',
-                    ]);
-
-                    // validate source & remove file
-                    if (isset($stream_local_url['host']))
-                    {
-                        if ($stream_local_url['host'] == @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
-                        {
-                            $this->MakeRequestNode('POST', 'remove', ['filename' => basename($stream_cloud_path), 'hash' => md5($stream_cloud_path)]);
-                        }
-                        else
-                        {
-                            if (File::exists(public_path($stream_local_path)))
-                            {
-                                File::delete(public_path($stream_local_path));
-                            }
-                        }
-                    }
-                }
-                else
+                // validate export download file
+                if ($stream_export_file['http_code'] !== 200)
                 {
                     JobTrace::where('id', $job_trace->id)->first()->update([
                         'status' => 'FAILED',
-                        'log'    => 'Failed sync to CDN servers.',
-                    ]);
+                        'log'    => 'Failed to generate export file, default path export not found.',
+                        'url'    => rawurldecode($stream_base_url),
+                    ]);    
+                }
+                else
+                {
+                    // force to variable
+                    $stream_export_file = $stream_export_file['data'];
+
+                    // upload to spaces
+                    if (FileStorage::disk("spaces")->put($stream_cloud_path, $stream_export_file, "public"))
+                    {
+                        $stream_cloud_url = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($stream_cloud_path));
+    
+                        // update job traces
+                        JobTrace::where('id', $job_trace->id)->first()->update([
+                            'explanation' => NULL,
+                            'log'         => NULL,
+                            'results'     => NULL,
+                            'url'         => rawurldecode($stream_cloud_url),
+                            'other_notes' => 'File archived on CDN servers.',
+                            'status'      => 'DONE',
+                        ]);
+    
+                        // validate source & remove file
+                        if (isset($stream_local_url['host']))
+                        {
+                            if ($stream_local_url['host'] == @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
+                            {
+                                $this->MakeRequestNode('POST', 'remove', ['filename' => basename($stream_cloud_path), 'hash' => md5($stream_cloud_path)]);
+                            }
+                            else
+                            {
+                                if (File::exists(public_path($stream_local_path)))
+                                {
+                                    File::delete(public_path($stream_local_path));
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        JobTrace::where('id', $job_trace->id)->first()->update([
+                            'status' => 'FAILED',
+                            'log'    => 'Failed sync to CDN servers.',
+                        ]);
+                    }
                 }
             }
             catch (Exception $exception)
