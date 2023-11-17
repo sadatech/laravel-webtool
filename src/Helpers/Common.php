@@ -76,33 +76,86 @@ class Common
         }
     }
 
-    public static function FetchGetContent($url, $http_code = false)
+    private static function FetchGetContent_Backup($url)
     {
-        $ch = curl_init();
-        $url_decode = rawurldecode($url);
-        $url_basename = basename($url_decode);
-        curl_setopt($ch, CURLOPT_URL, str_replace($url_basename, rawurlencode($url_basename), $url_decode));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
-        curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        $data = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if (curl_errno($ch))
+        try
         {
-            throw new Exception('Failed to execute CURL operations.');
-        }
-        curl_close($ch);
+            $data = file_get_contents($url, false, stream_context_create([
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                ]
+            ]));
 
-        if (!$http_code)
-        {
             return $data;
         }
-        else
+        catch (Exception $exception)
         {
-            return ['data' => $data, 'http_code' => $httpcode];
+            throw new Exception($exception->getMessage());
+        }
+    }
+
+    public static function FetchGetContent($url, $http_code = false)
+    {
+        $temp_file_stream_get_content = sys_get_temp_dir().DIRECTORY_SEPARATOR."laravel-webtool-stream-".uniqid();
+        $temp_stream_get_content = fopen($temp_file_stream_get_content, 'wb');
+
+        try
+        {
+            $ch = curl_init();
+            $url_decode = rawurldecode($url);
+            $url_basename = basename($url_decode);
+            curl_setopt($ch, CURLOPT_URL, str_replace($url_basename, rawurlencode($url_basename), $url_decode));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
+            curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_FILE, $temp_stream_get_content);
+            curl_exec($ch);
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlno = curl_errno($ch);
+            curl_close($ch);
+            @fclose($temp_stream_get_content);
+
+            if ($curlno)
+            {
+                @unlink($temp_file_stream_get_content);
+
+                $data = self::FetchGetContent_Backup(str_replace($url_basename, rawurlencode($url_basename), $url_decode));
+
+                if (!$http_code)
+                {
+                    return $data;
+                }
+                else
+                {
+                    return ['data' => $data, 'http_code' => 200];
+                }
+            }
+            else
+            {
+                $data = file_get_contents($temp_file_stream_get_content);
+                @unlink($temp_file_stream_get_content);
+        
+                if (!$http_code)
+                {
+                    return $data;
+                }
+                else
+                {
+                    return ['data' => $data, 'http_code' => $httpcode, 'message' => $http_code];
+                }
+            }
+    
+        }
+        catch(Exception $exception)
+        {
+            @fclose($temp_stream_get_content);
+            @unlink($temp_file_stream_get_content);
+
+            return ['data' => NULL, 'http_code' => 500, 'message' => $exception->getMessage()];
         }
     }
 }

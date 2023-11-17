@@ -87,10 +87,23 @@ trait DownloadGenerate
                     }
                     else
                     {
-                        $download['trace']->update([
-                            'status' => 'DELETED',
-                            'log' => 'File may no longer be available due to an export error or the file has expired.',
-                        ]);
+                        if (!empty($download['trace']->results))
+                        {
+                            $fetch_local_data = Common::FetchGetContent($download['trace']->results);
+
+                            return Response::make($fetch_local_data, '200', array(
+                                'Content-Disposition' => 'attachment; filename="'.basename($download['trace']->results).'"',
+                                'Pragma' => 'public',
+                                'Expires' => 0,
+                            ));
+                        }
+                        else
+                        {
+                            $download['trace']->update([
+                                'status' => 'DELETED',
+                                'log' => 'File may no longer be available due to an export error or the file has expired.',
+                            ]);
+                        }
                     }
                 }
             }

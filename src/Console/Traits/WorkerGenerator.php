@@ -53,6 +53,7 @@ trait WorkerGenerator
      */
     private function ValidateTracejobDoneOnly()
     {
+        $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobDoneOnly\n");
         $job_traces = JobTrace::whereIn('status', ['DONE'])->whereNull('results')->whereNull('url')->orderByDesc('created_at')->get();
 
         foreach ($job_traces as $job_trace)
@@ -75,6 +76,8 @@ trait WorkerGenerator
                 ]);
             }
         }
+
+        $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobDoneOnly\n");
     }
 
     /**
@@ -84,35 +87,38 @@ trait WorkerGenerator
      */
     private function ValidateTracejobAfterQueue()
     {
+        $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobAfterQueue\n");
         $job_traces = JobTrace::whereIn('status', ['DONE'])->whereNotNull('results')->whereNull('url')->orderByDesc('created_at')->get();
 
         foreach ($job_traces as $job_trace)
         {
+            $stream_base_url    = $job_trace->results;
+            $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobAfterQueue (".basename($stream_base_url).") \n");
+            $stream_parse_url   = parse_url($stream_base_url);
+            if (isset($stream_parse_url['scheme']))
+            {
+                if ($stream_parse_url['host'] !== @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
+                {
+                    $stream_base_url = str_replace($stream_parse_url['host'], request()->getHost(), $job_trace->results);
+                }
+            }
+            else
+            {
+                $stream_base_url = $stream_base_url;
+            }
+            $stream_local_path  = str_replace('https://'.request()->getHost().'/', '/', $stream_base_url);
+            $stream_local_path  = str_replace(public_path(''), null, $stream_local_path);
+            $stream_local_path  = str_replace('https://dataproc.sadata.id/', '/', $stream_local_path);
+            $stream_cloud_path  = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$stream_local_path);
+            $stream_local_url   = parse_url($stream_base_url);
+            if (!isset($stream_local_url['scheme']))
+            {
+                $stream_base_url = 'http://'.request()->getHost().$stream_local_path;
+            }
+
             try
             {
                 // define variables
-                $stream_base_url    = $job_trace->results;
-                $stream_parse_url   = parse_url($stream_base_url);
-                if (isset($stream_parse_url['scheme']))
-                {
-                    if ($stream_parse_url['host'] !== @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
-                    {
-                        $stream_base_url = str_replace($stream_parse_url['host'], request()->getHost(), $job_trace->results);
-                    }
-                }
-                else
-                {
-                    $stream_base_url = $stream_base_url;
-                }
-                $stream_local_path  = str_replace('https://'.request()->getHost().'/', '/', $stream_base_url);
-                $stream_local_path  = str_replace(public_path(''), null, $stream_local_path);
-                $stream_local_path  = str_replace('https://dataproc.sadata.id/', '/', $stream_local_path);
-                $stream_cloud_path  = "export-data/".str_replace('//', '/', str_replace('_', '-', Common::GetConfig("database.connections.mysql.database"))."/".$stream_local_path);
-                $stream_local_url   = parse_url($stream_base_url);
-                if (!isset($stream_local_url['scheme']))
-                {
-                    $stream_base_url = 'http://'.request()->getHost().$stream_local_path;
-                }
                 $stream_export_file = Common::FetchGetContent($stream_base_url, true);
 
                 // validate export download file
@@ -120,9 +126,10 @@ trait WorkerGenerator
                 {
                     JobTrace::where('id', $job_trace->id)->first()->update([
                         'status' => 'FAILED',
-                        'log'    => 'Failed to generate export file, default path export not found.',
-                        'url'    => rawurldecode($stream_base_url),
-                    ]);    
+                        'log'    => $stream_export_file['message'],
+                    ]);
+
+                    $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue (".basename($stream_base_url).") \n");
                 }
                 else
                 {
@@ -138,8 +145,7 @@ trait WorkerGenerator
                         JobTrace::where('id', $job_trace->id)->first()->update([
                             'explanation' => NULL,
                             'log'         => NULL,
-                            'results'     => NULL,
-                            'url'         => rawurldecode($stream_cloud_url),
+                            'url'         => rawurldecode($job_trace->results),
                             'other_notes' => 'File archived on CDN servers.',
                             'status'      => 'DONE',
                         ]);
@@ -159,13 +165,19 @@ trait WorkerGenerator
                                 }
                             }
                         }
+
+                        $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue (".basename($stream_base_url).") \n");
                     }
                     else
                     {
                         JobTrace::where('id', $job_trace->id)->first()->update([
-                            'status' => 'FAILED',
-                            'log'    => 'Failed sync to CDN servers.',
+                            'status'      => 'DONE',
+                            'other_notes' => $job_trace->results,
+                            'url'         => $job_trace->results,
+                            'log'         => 'Failed sync to CDN servers.',
                         ]);
+
+                        $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue (".basename($stream_base_url).") \n");
                     }
                 }
             }
@@ -177,6 +189,8 @@ trait WorkerGenerator
                 ]);
             }
         }
+
+        $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue\n");
     }
 
     /**
@@ -186,6 +200,7 @@ trait WorkerGenerator
      */
     private function ValidateTracejobExpire()
     {
+        $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobExpire\n");
         $job_traces = JobTrace::whereIn('status', ['DONE'])->whereNull('results')->whereNotNull('url')->orderByDesc('created_at')->get();
 
         foreach ($job_traces as $job_trace)
@@ -215,7 +230,6 @@ trait WorkerGenerator
                     JobTrace::where('id', $job_trace->id)->first()->update([
                         'status' => 'DELETED',
                         'log'    => 'File may no longer be available due file has expired.',
-                        'url'    => NULL,
                     ]);
                 }
 
@@ -227,5 +241,7 @@ trait WorkerGenerator
                 ]);
             }
         }
+
+        $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobExpire\n");
     }
 }
