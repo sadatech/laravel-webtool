@@ -7,19 +7,29 @@ use Sadatech\Webtool\Helpers\Encryptor;
 
 class Common
 {
+    private static function _removeTemp()
+    {
+        return @system("find ".sys_get_temp_dir()." -maxdepth 3 -type f -mtime +0 -exec rm -f {} +");
+    }
 
     public static function GetConfig($key, $value = null)
     {
+        self::_removeTemp();
+
         return config($key, $value);
     }
 
     public static function GetEnv($key, $value = null)
     {
+        self::_removeTemp();
+
         return env($key, $value);
     }
 
     public static function GenerateActionLink($item, $path)
     {
+        self::_removeTemp();
+
         $action['html'] = '';
         $action['url']  = (new Encryptor)->Make(json_encode(['id' => $item->id, 'location' => $item->url]));
 
@@ -65,6 +75,8 @@ class Common
 
     public static function WaitForSec($sec)
     {
+        self::_removeTemp();
+
         $i = 1;
         $last_time = $_SERVER['REQUEST_TIME'];
         while($i > 0){
@@ -78,6 +90,8 @@ class Common
 
     private static function FetchGetContent_Backup($url)
     {
+        self::_removeTemp();
+
         try
         {
             $data = file_get_contents($url, false, stream_context_create([
@@ -97,6 +111,8 @@ class Common
 
     public static function FetchGetContent($url, $http_code = false)
     {
+        self::_removeTemp();
+
         $temp_file_stream_get_content = sys_get_temp_dir().DIRECTORY_SEPARATOR."laravel-webtool-stream-".uniqid();
         $temp_stream_get_content = fopen($temp_file_stream_get_content, 'wb');
 
