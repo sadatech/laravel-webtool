@@ -53,11 +53,12 @@ trait WorkerGenerator
      */
     private function ValidateTracejobDoneOnly()
     {
-        $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobDoneOnly\n");
         $job_traces = JobTrace::whereIn('status', ['DONE'])->whereNull('results')->whereNull('url')->orderByDesc('created_at')->get();
-
+        
         foreach ($job_traces as $job_trace)
         {
+            $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobDoneOnly\n");
+
             try
             {
                 JobTrace::where('id', $job_trace->id)->first()->update([
@@ -67,6 +68,8 @@ trait WorkerGenerator
                     'status'      => 'FAILED',
                     'log'         => 'Failed to generate export file.',
                 ]);
+
+                $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobDoneOnly\n");
             }
             catch (Exception $exception)
             {
@@ -74,10 +77,10 @@ trait WorkerGenerator
                     'status' => 'FAILED',
                     'log'    => $exception->getMessage(),
                 ]);
+
+                $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobDoneOnly\n");
             }
         }
-
-        $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobDoneOnly\n");
     }
 
     /**
@@ -87,13 +90,12 @@ trait WorkerGenerator
      */
     private function ValidateTracejobAfterQueue()
     {
-        $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobAfterQueue\n");
         $job_traces = JobTrace::whereIn('status', ['DONE'])->whereNotNull('results')->whereNull('url')->orderByDesc('created_at')->get();
 
         foreach ($job_traces as $job_trace)
         {
             $stream_base_url    = $job_trace->results;
-            $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobAfterQueue (".basename($stream_base_url).") \n");
+            $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobAfterQueue\n");
             $stream_parse_url   = parse_url($stream_base_url);
             if (isset($stream_parse_url['scheme']))
             {
@@ -118,10 +120,8 @@ trait WorkerGenerator
 
             try
             {
-                // define variables
-                $stream_export_file = Common::FetchGetContent($stream_base_url, true);
+                $stream_export_file = Common::FetchGetContent($stream_base_url, true, true);
 
-                // validate export download file
                 if ($stream_export_file['http_code'] !== 200)
                 {
                     JobTrace::where('id', $job_trace->id)->first()->update([
@@ -129,28 +129,14 @@ trait WorkerGenerator
                         'log'    => $stream_export_file['message'],
                     ]);
 
-                    $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue (".basename($stream_base_url).") \n");
+                    $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
                 }
                 else
                 {
-                    // force to variable
-                    $stream_export_file = $stream_export_file['data'];
-
-                    // upload to spaces
-                    if (FileStorage::disk("spaces")->put($stream_cloud_path, $stream_export_file, "public"))
+                    if (FileStorage::disk("spaces")->put($stream_cloud_path, $stream_export_file['data'], "public"))
                     {
                         $stream_cloud_url = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($stream_cloud_path));
-    
-                        // update job traces
-                        JobTrace::where('id', $job_trace->id)->first()->update([
-                            'explanation' => NULL,
-                            'log'         => NULL,
-                            'url'         => rawurldecode($job_trace->results),
-                            'other_notes' => 'File archived on CDN servers.',
-                            'status'      => 'DONE',
-                        ]);
-    
-                        // validate source & remove file
+
                         if (isset($stream_local_url['host']))
                         {
                             if ($stream_local_url['host'] == @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
@@ -166,31 +152,28 @@ trait WorkerGenerator
                             }
                         }
 
-                        $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue (".basename($stream_base_url).") \n");
-                    }
-                    else
-                    {
                         JobTrace::where('id', $job_trace->id)->first()->update([
+                            'explanation' => NULL,
+                            'log'         => 'Local file deleted & File archived on CDN servers.',
+                            'results'     => NULL,
+                            'url'         => rawurldecode($stream_cloud_url),
                             'status'      => 'DONE',
-                            'other_notes' => $job_trace->results,
-                            'url'         => $job_trace->results,
-                            'log'         => 'Failed sync to CDN servers.',
                         ]);
 
-                        $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue (".basename($stream_base_url).") \n");
+                        $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue\n");
                     }
                 }
             }
-            catch (Exception $exception)
+            catch (Exeception $exception)
             {
                 JobTrace::where('id', $job_trace->id)->first()->update([
                     'status' => 'FAILED',
                     'log'    => $exception->getMessage(),
                 ]);
+
+                $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
             }
         }
-
-        $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue\n");
     }
 
     /**
@@ -200,7 +183,6 @@ trait WorkerGenerator
      */
     private function ValidateTracejobExpire()
     {
-        $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobExpire\n");
         $job_traces = JobTrace::whereIn('status', ['DONE'])->whereNull('results')->whereNotNull('url')->orderByDesc('created_at')->get();
 
         foreach ($job_traces as $job_trace)
@@ -212,6 +194,7 @@ trait WorkerGenerator
             {
                 if ($stream_date_file < $stream_date_now)
                 {
+                    $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobExpire\n");
                     $stream_base_url   = urldecode($job_trace->url);
                     $stream_parse_url  = parse_url($job_trace->url);
                     $stream_cloud_path = str_replace($stream_parse_url['scheme'].'://'.$stream_parse_url['host'].'/', '/', $stream_base_url);
@@ -231,17 +214,18 @@ trait WorkerGenerator
                         'status' => 'DELETED',
                         'log'    => 'File may no longer be available due file has expired.',
                     ]);
-                }
 
+                    $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobExpire\n");
+                }
             }
             catch (Exception $exception)
             {
                 JobTrace::where('id', $job_trace->id)->first()->update([
                     'log' => $exception->getMessage(),
                 ]);
+
+                $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobExpire\n");
             }
         }
-
-        $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobExpire\n");
     }
 }

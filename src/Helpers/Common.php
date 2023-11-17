@@ -9,26 +9,26 @@ class Common
 {
     private static function _removeTemp()
     {
-        return @system("find ".sys_get_temp_dir()." -maxdepth 3 -type f -mtime +0 -exec rm -f {} +");
+        @system("find ".sys_get_temp_dir()." -maxdepth 3 -type f -mtime +0 -exec rm -f {} +");
     }
 
     public static function GetConfig($key, $value = null)
     {
-        self::_removeTemp();
+        @self::_removeTemp();
 
         return config($key, $value);
     }
 
     public static function GetEnv($key, $value = null)
     {
-        self::_removeTemp();
+        @self::_removeTemp();
 
         return env($key, $value);
     }
 
     public static function GenerateActionLink($item, $path)
     {
-        self::_removeTemp();
+        @self::_removeTemp();
 
         $action['html'] = '';
         $action['url']  = (new Encryptor)->Make(json_encode(['id' => $item->id, 'location' => $item->url]));
@@ -75,7 +75,7 @@ class Common
 
     public static function WaitForSec($sec)
     {
-        self::_removeTemp();
+        @self::_removeTemp();
 
         $i = 1;
         $last_time = $_SERVER['REQUEST_TIME'];
@@ -90,7 +90,7 @@ class Common
 
     private static function FetchGetContent_Backup($url)
     {
-        self::_removeTemp();
+        @self::_removeTemp();
 
         try
         {
@@ -109,12 +109,15 @@ class Common
         }
     }
 
-    public static function FetchGetContent($url, $http_code = false)
+    public static function FetchGetContent($url, $http_code = false, $file_temp = false)
     {
-        self::_removeTemp();
+        @self::_removeTemp();
 
-        $temp_file_stream_get_content = sys_get_temp_dir().DIRECTORY_SEPARATOR."laravel-webtool-stream-".uniqid();
-        $temp_stream_get_content = fopen($temp_file_stream_get_content, 'wb');
+        if ($file_temp)
+        {
+            $temp_file_stream_get_content = sys_get_temp_dir().DIRECTORY_SEPARATOR."WEBTOOLSTREAM_".uniqid();
+            $temp_stream_get_content = @fopen($temp_file_stream_get_content, 'wbr+');
+        }
 
         try
         {
@@ -128,17 +131,30 @@ class Common
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($ch, CURLOPT_FILE, $temp_stream_get_content);
-            curl_exec($ch);
+            
+            if ($file_temp)
+            {
+                curl_setopt($ch, CURLOPT_FILE, $temp_stream_get_content);
+                curl_exec($ch);
+            }
+            else
+            {
+                $data = curl_exec($ch);
+            }
+
             $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $curlno = curl_errno($ch);
             curl_close($ch);
-            @fclose($temp_stream_get_content);
+
+            if ($file_temp)
+            {
+                @fclose($temp_stream_get_content);
+                $data = file_get_contents($temp_file_stream_get_content);
+                @unlink($temp_file_stream_get_content);
+            }
 
             if ($curlno)
             {
-                @unlink($temp_file_stream_get_content);
-
                 $data = self::FetchGetContent_Backup(str_replace($url_basename, rawurlencode($url_basename), $url_decode));
 
                 if (!$http_code)
@@ -150,26 +166,23 @@ class Common
                     return ['data' => $data, 'http_code' => 200];
                 }
             }
+
+            if (!$http_code)
+            {
+                return $data;
+            }
             else
             {
-                $data = file_get_contents($temp_file_stream_get_content);
-                @unlink($temp_file_stream_get_content);
-        
-                if (!$http_code)
-                {
-                    return $data;
-                }
-                else
-                {
-                    return ['data' => $data, 'http_code' => $httpcode, 'message' => $http_code];
-                }
+                return ['data' => $data, 'http_code' => $httpcode, 'message' => $http_code];
             }
-    
         }
         catch(Exception $exception)
         {
-            @fclose($temp_stream_get_content);
-            @unlink($temp_file_stream_get_content);
+            if ($file_temp)
+            {
+                @fclose($temp_stream_get_content);
+                @unlink($temp_file_stream_get_content);
+            }
 
             return ['data' => NULL, 'http_code' => 500, 'message' => $exception->getMessage()];
         }
