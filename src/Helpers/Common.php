@@ -60,7 +60,7 @@ class Common
             {
                 $action['html'] .= "
                 <form method='post' action='".route('webtool.download.generate', $action['url'])."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
-                    <button type='submit' style='width: 80%;' class='btn btn-sm btn-success btn-square'><i class='fa fa-cloud-download'></i></button>
+                    <button type='submit' style='width: 80%;' class='btn btn-sm btn-success btn-square' formtarget='_blank'><i class='fa fa-cloud-download'></i></button>
                 </form>
                 ";
             }
@@ -109,7 +109,7 @@ class Common
         }
     }
 
-    public static function FetchGetContent($url, $http_code = false, $file_temp = false)
+    public static function FetchGetContent($url, $http_code = false, $file_temp = false, $postfields = null)
     {
         @self::_removeTemp();
 
@@ -125,6 +125,13 @@ class Common
             $url_decode = rawurldecode($url);
             $url_basename = basename($url_decode);
             curl_setopt($ch, CURLOPT_URL, str_replace($url_basename, rawurlencode($url_basename), $url_decode));
+
+            if (is_array($postfields))
+            {
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
+            }
+
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
             curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);

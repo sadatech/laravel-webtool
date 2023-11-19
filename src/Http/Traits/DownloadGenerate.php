@@ -1,6 +1,7 @@
 <?php
 namespace Sadatech\Webtool\Http\Traits;
 
+use Exception;
 use App\JobTrace;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
@@ -60,29 +61,34 @@ trait DownloadGenerate
                         $download['s3size'] = FileStorage::disk("spaces")->size($download['path']);
                         $download['s3mime'] = FileStorage::disk("spaces")->mimeType($download['path']);
     
-                        // if ($download['s3size'] > 512606337)
-                        $feth_space_data = Common::FetchGetContent(FileStorage::disk("spaces")->url($download['path']), true);
-
-                        if ($feth_space_data['http_code'] !== 200)
+                        try 
                         {
-                            $download['trace']->update([
-                                'status'  => 'DELETED',
-                                'results' => NULL,
-                                'url'     => NULL,
-                                'log'     => 'File may no longer be available due to an export error.',
-                            ]);
+                            $send_global_url  = FileStorage::disk("spaces")->url($download['path']);
+                            $send_global_url  = base64_encode($send_global_url);
+                            $send_global_url  = str_rot13($send_global_url);
+                            $send_global_data = Common::FetchGetContent("https://global-mirror.sadata.id", true, false, ["url" => $send_global_url]);
 
-                            return redirect()->back()->withErrors(['message' => 'File may no longer be available due to an export error.']);
+                            if ($send_global_data['http_code'] !== 200)
+                            {
+                                return redirect()->back()->withErrors(['message' => 'Failed to download file, download link is invalid/expired.']);
+                            }
+                            else
+                            {
+                                $send_data = json_decode($send_global_data['data']);
+
+                                if (isset($send_data->data->preview_url))
+                                {
+                                    return redirect()->to($send_data->data->preview_url);
+                                }
+                                else
+                                {
+                                    return redirect()->back()->withErrors(['message' => 'Failed to download file, download link is invalid/expired.']);
+                                }
+                            }
                         }
-                        else
+                        catch (Exception $ex)
                         {
-                            return Response::make($feth_space_data['data'], '200', array(
-                                'Content-Type' => $download['s3mime'],
-                                'Content-Disposition' => 'attachment; filename="'.$download['s3name'].'"',
-                                'Content-Length' => $download['s3size'],
-                                'Pragma' => 'public',
-                                'Expires' => 0,
-                            ));
+                            return redirect()->back()->withErrors(['message' => 'Failed to download file, download link is invalid/expired.']);
                         }
                     }
                     else
