@@ -95,13 +95,28 @@ trait DownloadGenerate
                     {
                         if (!empty($download['trace']->results))
                         {
-                            $fetch_local_data = Common::FetchGetContent($download['trace']->results);
+                            $send_global_url  = FileStorage::disk("spaces")->url($download['trace']->results);
+                            $send_global_url  = base64_encode($send_global_url);
+                            $send_global_url  = str_rot13($send_global_url);
+                            $send_global_data = Common::FetchGetContent("https://global-mirror.sadata.id", true, false, ["url" => $send_global_url]);
 
-                            return Response::make($fetch_local_data, '200', array(
-                                'Content-Disposition' => 'attachment; filename="'.basename($download['trace']->results).'"',
-                                'Pragma' => 'public',
-                                'Expires' => 0,
-                            ));
+                            if ($send_global_data['http_code'] !== 200)
+                            {
+                                return redirect()->back()->withErrors(['message' => 'Failed to download file, download link is invalid/expired.']);
+                            }
+                            else
+                            {
+                                $send_data = json_decode($send_global_data['data']);
+
+                                if (isset($send_data->data->preview_url))
+                                {
+                                    return redirect()->to($send_data->data->preview_url);
+                                }
+                                else
+                                {
+                                    return redirect()->back()->withErrors(['message' => 'Failed to download file, download link is invalid/expired.']);
+                                }
+                            }
                         }
                         else
                         {
