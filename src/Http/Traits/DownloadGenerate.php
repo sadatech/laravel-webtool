@@ -95,13 +95,7 @@ trait DownloadGenerate
                     {
                         if (!empty($download['trace']->results))
                         {
-                            $fetch_local_data = Common::FetchGetContent($download['trace']->results);
-
-                            return Response::make($fetch_local_data, '200', array(
-                                'Content-Disposition' => 'attachment; filename="'.basename($download['trace']->results).'"',
-                                'Pragma' => 'public',
-                                'Expires' => 0,
-                            ));
+                            return redirect()->to($download['trace']->results);
                         }
                         else
                         {
