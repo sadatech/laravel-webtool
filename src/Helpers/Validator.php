@@ -17,9 +17,6 @@ class Validator
         {
             mkdir($this->local_file_path);
         }
-
-        // Remove cache files
-        Common::tempRemoveCache($this->local_file_path, "-not -newermt '-30 seconds'");
     }
 
     /**
