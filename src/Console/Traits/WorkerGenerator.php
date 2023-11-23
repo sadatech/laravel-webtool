@@ -26,6 +26,7 @@ trait WorkerGenerator
         $_[] = $this->ValidateTracejobDoneOnly();
         $_[] = $this->ValidateTracejobAfterQueue();
         $_[] = $this->ValidateTracejobExpire();
+        $_[] = $this->RemoveCacheFiles();
     }
 
     /**
@@ -227,5 +228,16 @@ trait WorkerGenerator
                 $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobExpire\n");
             }
         }
+    }
+
+    /**
+     * Remove Cache Files
+     */
+    private function RemoveCacheFiles()
+    {
+        $this->output->write("[".Carbon::now()."] Processing: Webtool\RemoveCacheFiles\n");
+        Common::tempRemoveCache(sys_get_temp_dir().DIRECTORY_SEPARATOR.'.wtenc'.DIRECTORY_SEPARATOR);
+        Common::tempRemoveCache(sys_get_temp_dir().DIRECTORY_SEPARATOR.'.wtval'.DIRECTORY_SEPARATOR, "-not -newermt '-30 seconds'");
+        $this->output->write("[".Carbon::now()."] Processed: Webtool\RemoveCacheFiles\n");
     }
 }
