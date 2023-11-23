@@ -14,6 +14,9 @@ class Encryptor
         {
             mkdir($this->local_file_path);
         }
+
+        // Remove cache files
+        Common::tempRemoveCache($this->local_file_path);
     }
 
     public function Make($string, $salt = '')
