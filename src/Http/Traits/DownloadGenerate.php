@@ -61,11 +61,13 @@ trait DownloadGenerate
                         $download['s3size'] = FileStorage::disk("spaces")->size($download['path']);
                         $download['s3mime'] = FileStorage::disk("spaces")->mimeType($download['path']);
     
-                        try 
+                        $send_global_url  = FileStorage::disk("spaces")->url($download['path']);
+                        $send_global_url  = base64_encode($send_global_url);
+                        $send_global_url  = str_rot13($send_global_url);
+                        $cloud_url_real   = str_replace("https://sadata-cdn.sgp1.digitaloceanspaces.com", Common::GetConfig('filesystems.disks.spaces.url'), $download['path']);
+
+                        try
                         {
-                            $send_global_url  = FileStorage::disk("spaces")->url($download['path']);
-                            $send_global_url  = base64_encode($send_global_url);
-                            $send_global_url  = str_rot13($send_global_url);
                             $send_global_data = Common::FetchGetContent("https://global-mirror.sadata.id", true, false, ["url" => $send_global_url]);
 
                             if ($send_global_data['http_code'] !== 200)
@@ -82,13 +84,13 @@ trait DownloadGenerate
                                 }
                                 else
                                 {
-                                    return redirect()->back()->withErrors(['message' => 'Failed to download file, download link is invalid/expired.']);
+                                    return redirect()->to($cloud_url_real);
                                 }
                             }
                         }
                         catch (Exception $ex)
                         {
-                            return redirect()->back()->withErrors(['message' => 'Failed to download file, download link is invalid/expired.']);
+                            return redirect()->to($cloud_url_real);
                         }
                     }
                     else
