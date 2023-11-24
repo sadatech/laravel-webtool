@@ -26,7 +26,7 @@ trait WorkerGenerator
         $_[] = $this->ValidateTracejobDoneOnly();
         $_[] = $this->ValidateTracejobAfterQueue();
         $_[] = $this->ValidateTracejobExpire();
-        $_[] = $this->RemoveCacheFiles();
+        // $_[] = $this->RemoveCacheFiles();
     }
 
     /**
@@ -168,8 +168,7 @@ trait WorkerGenerator
             catch (Exeception $exception)
             {
                 JobTrace::where('id', $job_trace->id)->first()->update([
-                    'status' => 'FAILED',
-                    'log'    => $exception->getMessage(),
+                    'other_notes' => "Failed to execute `ValidateTracejobAfterQueue` maybe error on `Common::FetchGetContent` or `FileStorage::disk(spaces)->put()` (" . $exception->getMessage() . ")",
                 ]);
 
                 $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
