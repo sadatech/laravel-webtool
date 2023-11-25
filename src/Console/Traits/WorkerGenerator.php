@@ -123,16 +123,7 @@ trait WorkerGenerator
             {
                 $stream_export_file = Common::FetchGetContent($stream_base_url, true, true);
 
-                if ($stream_export_file['http_code'] !== 200)
-                {
-                    JobTrace::where('id', $job_trace->id)->first()->update([
-                        'status' => 'FAILED',
-                        'log'    => $stream_export_file['message'],
-                    ]);
-
-                    $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
-                }
-                else
+                if ($stream_export_file['http_code'] == 200)
                 {
                     if (FileStorage::disk("spaces")->put($stream_cloud_path, $stream_export_file['data'], "public"))
                     {
@@ -164,6 +155,17 @@ trait WorkerGenerator
                         $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue\n");
                     }
                 }
+
+                // else
+                // {
+                //     JobTrace::where('id', $job_trace->id)->first()->update([
+                //         'status' => 'FAILED',
+                //         'log'    => $stream_export_file['message'],
+                //     ]);
+
+                //     $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
+                // }
+
             }
             catch (Exeception $exception)
             {
