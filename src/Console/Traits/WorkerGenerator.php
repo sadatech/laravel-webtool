@@ -155,16 +155,14 @@ trait WorkerGenerator
                         $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue\n");
                     }
                 }
+                else
+                {
+                    JobTrace::where('id', $job_trace->id)->first()->update([
+                        'other_notes' => "Worker `stream_export_file` return error (" . $stream_export_file['message'] . ")",
+                    ]);
 
-                // else
-                // {
-                //     JobTrace::where('id', $job_trace->id)->first()->update([
-                //         'status' => 'FAILED',
-                //         'log'    => $stream_export_file['message'],
-                //     ]);
-
-                //     $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
-                // }
+                    $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
+                }
 
             }
             catch (Exeception $exception)

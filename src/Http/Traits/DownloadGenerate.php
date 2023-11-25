@@ -72,7 +72,7 @@ trait DownloadGenerate
 
                             if ($send_global_data['http_code'] !== 200)
                             {
-                                return redirect()->back()->withErrors(['message' => 'Failed to download file, download link is invalid/expired.']);
+                                return redirect()->to($cloud_url_real);
                             }
                             else
                             {
