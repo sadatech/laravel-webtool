@@ -11,7 +11,7 @@ class Validator
      */
     public function __construct()
     {
-        $this->local_file_path = sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->local_file_prefix.DIRECTORY_SEPARATOR;
+        $this->local_file_path = sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->local_file_prefix;
     }
 
     /**
