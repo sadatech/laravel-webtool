@@ -97,7 +97,38 @@ trait DownloadGenerate
                     {
                         if (!empty($download['trace']->results))
                         {
-                            return redirect()->to($download['trace']->results);
+                            // return redirect()->to($download['trace']->results);
+                            $send_global_url  = FileStorage::disk("spaces")->url($download['trace']->results);
+                            $send_global_url  = base64_encode($send_global_url);
+                            $send_global_url  = str_rot13($send_global_url);
+                            $cloud_url_real   = $download['trace']->results;
+
+                            try
+                            {
+                                $send_global_data = Common::FetchGetContent("https://global-mirror.sadata.id", true, false, ["url" => $send_global_url]);
+
+                                if ($send_global_data['http_code'] !== 200)
+                                {
+                                    return redirect()->to($cloud_url_real);
+                                }
+                                else
+                                {
+                                    $send_data = json_decode($send_global_data['data']);
+
+                                    if (isset($send_data->data->preview_url))
+                                    {
+                                        return redirect()->to($send_data->data->preview_url);
+                                    }
+                                    else
+                                    {
+                                        return redirect()->to($cloud_url_real);
+                                    }
+                                }
+                            }
+                            catch (Exception $ex)
+                            {
+                                return redirect()->to($cloud_url_real);
+                            }
                         }
                         else
                         {

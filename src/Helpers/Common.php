@@ -39,14 +39,9 @@ class Common
             // validate if empty url
             if (empty($item->url))
             {
-                // $action['html'] .= "
-                // <form method='post' action=''>
-                //     <button type='button' style='width: 80%;' class='btn btn-sm btn-success btn-square disabled' disabled ><i class='fa fa-spinner fa-spin'></i></button>
-                // </form>
-                // ";
                 $action['html'] .= "
-                <form method='post' action='".route('webtool.download.generate', $item->results)."?reqid=".hash('sha256', $item->results.time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
-                    <button type='submit' style='width: 80%;' class='btn btn-sm btn-success btn-square' formtarget='_blank'><i class='fa fa-cloud-download'></i></button>
+                <form method='post' action=''>
+                    <button type='button' style='width: 80%;' class='btn btn-sm btn-success btn-square disabled' disabled ><i class='fa fa-spinner fa-spin'></i></button>
                 </form>
                 ";
             }
