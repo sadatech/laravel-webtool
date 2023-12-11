@@ -158,7 +158,9 @@ trait WorkerGenerator
                 else
                 {
                     JobTrace::where('id', $job_trace->id)->first()->update([
+                        'status'      => 'FAILED',
                         'other_notes' => "Worker `stream_export_file` return error (" . $stream_export_file['message'] . ")",
+                        'log'         => 'Failed to fetch exported data from worker.',
                     ]);
 
                     $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
