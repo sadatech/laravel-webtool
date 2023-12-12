@@ -100,9 +100,16 @@ trait WorkerGenerator
             $stream_parse_url   = parse_url($stream_base_url);
             if (isset($stream_parse_url['scheme']))
             {
-                if ($stream_parse_url['host'] !== @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
+                if (Common::GetEnv('DATAPROC_URL') == '' || is_null(Common::GetEnv('DATAPROC_URL')))
                 {
-                    $stream_base_url = str_replace($stream_parse_url['host'], request()->getHost(), $job_trace->results);
+                    if ($stream_parse_url['host'] !== @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
+                    {
+                        $stream_base_url = str_replace($stream_parse_url['host'], request()->getHost(), $job_trace->results);
+                    }
+                }
+                else
+                {
+                    $stream_base_url = $stream_base_url;
                 }
             }
             else
@@ -164,6 +171,7 @@ trait WorkerGenerator
                     ]);
 
                     $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
+                    $this->output->write("[".Carbon::now()."] Failed: ".$stream_base_url."\n");
                 }
 
             }
