@@ -9,7 +9,7 @@ trait ExtendedJob
     public function MakeRequestNode($scheme, $endpoint, $build_query, $job_trace = NULL)
     {
         $http_scheme = strtoupper($scheme);
-        $http_endpoint = Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/').$endpoint;
+        $http_endpoint = Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id').'/'.$endpoint;
         $http_build_query = $build_query;
         $http_client = new HTTP_Client;
 
