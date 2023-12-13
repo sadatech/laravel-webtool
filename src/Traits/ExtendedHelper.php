@@ -20,22 +20,31 @@ trait ExtendedHelper
     /**
      * 
      */
-    public static function CatchRequestData(string $uname)
+    public static function CatchRequestData(string $uname, $type = 'json')
     {
+        /**
+         * Remove Old Dump
+         */
+        self::RemoveOldDump('1 days');
+
         /**
          * 
          */
         self::$catch['dump_name'] = $uname;
         self::$catch['dump_date'] = date('Y-m-d H:i:s');
-        self::$catch['dump_hash'] = hash('md5', json_encode(self::$catch['dump_name']));
-        self::$catch['dump_file'] = "webtool".DIRECTORY_SEPARATOR."dump".DIRECTORY_SEPARATOR."webtool_dump_".self::$catch['dump_hash'].".yml";
-        
+        self::$catch['dump_hash'] = strtoupper(hash('crc32', self::$catch['dump_name'].self::$catch['dump_date']));
+        self::$catch['dump_file'] = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', self::$catch['dump_name']);
+        self::$catch['dump_file'] = mb_ereg_replace("([\.]{2,})", '', self::$catch['dump_file']);
+        self::$catch['dump_file'] = "webtool".DIRECTORY_SEPARATOR."dump".DIRECTORY_SEPARATOR."DUMP(".self::$catch['dump_hash'].")_".self::$catch['dump_file'];
+
         /**
          * 
          */
         try
         {
-            self::$catch['dump_user'] = JWTAuth::parseToken()->authenticate();
+            self::$catch['dump_auth'] = JWTAuth::parseToken()->authenticate();
+            self::$catch['dump_user']['id'] = self::$catch['dump_auth']->id;
+            self::$catch['dump_user']['name'] = self::$catch['dump_auth']->name;
         }
         catch (TokenExpiredException $e)
         {
@@ -55,25 +64,64 @@ trait ExtendedHelper
         }
 
         /**
+         * Header dump
+         */
+        self::$catch['dump_header'] = request()->header();
+
+        /**
          * Validate Raw or Body
          */
-        self::$catch['request']   = request();
-        if (self::$catch['request']->getContent() == "" || self::$catch['request']->getContent() == null)
+        self::$catch['dump_request'] = request();
+        if (self::$catch['dump_request']->getContent() == "")
         {
-            self::$catch['dump_data'] = self::$catch['request']->all();
+            self::$catch['dump_request'] = self::$catch['dump_request']->all();
         }
         else
         {
-            self::$catch['dump_data'] = json_decode(self::$catch['request']->getContent());
+            self::$catch['dump_request'] = json_decode(self::$catch['dump_request']->getContent(), true);
         }
-        unset(self::$catch['request']);
 
         /**
          * 
          */
-        // file_put_contents(sys_get_temp_dir().DIRECTORY_SEPARATOR.self::$catch['dump_file'], Yaml::dump(self::$catch, Yaml::PARSE_OBJECT));
-        Storage::disk('local')->exists(self::$catch['dump_file']) ? Storage::disk('local')->delete(self::$catch['dump_file']) : null;
+        unset(self::$catch['dump_auth']);
+        unset(self::$catch['dump_hash']);
 
-        return Storage::disk('local')->put(self::$catch['dump_file'], Yaml::dump(self::$catch, Yaml::PARSE_OBJECT));
+        /**
+         * 
+         */
+        if ($type == "json")
+        {
+            self::$catch['dump_file'] = self::$catch['dump_file'].".json";
+            self::$catch['dump_raw']  = json_encode(self::$catch, JSON_PRETTY_PRINT);
+        }
+        elseif ($type == "yaml")
+        {
+            self::$catch['dump_file'] = self::$catch['dump_file'].".yaml";
+            self::$catch['dump_raw']  = Yaml::dump(self::$catch);
+        }
+        
+        Storage::disk('local')->exists(self::$catch['dump_file']) ? Storage::disk('local')->delete(self::$catch['dump_file']) : null;
+        return Storage::disk('local')->put(self::$catch['dump_file'], self::$catch['dump_raw']);
+    }
+
+    /**
+     * 
+     */
+    private static function RemoveOldDump($range = '+5 day')
+    {
+        $files = glob(Storage::disk('local')->path('webtool'.DIRECTORY_SEPARATOR.'dump') . DIRECTORY_SEPARATOR . '*');
+        $threshold = strtotime($range);
+
+        foreach ($files as $file)
+        {
+            if (is_file($file))
+            {
+                // if ($threshold >= filemtime($file))
+                // {
+                //     Storage::disk('local')->delete('webtool'.DIRECTORY_SEPARATOR.'dump'.DIRECTORY_SEPARATOR.basename($file));
+                // }
+            }
+        }
     }
 }
