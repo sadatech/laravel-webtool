@@ -15,65 +15,65 @@ trait ExtendedHelper
     /**
      * 
      */
-    protected $catch = [];
+    protected static $catch = [];
 
     /**
      * 
      */
-    public function CatchRequestData(string $uname)
+    public static function CatchRequestData(string $uname)
     {
         /**
          * 
          */
-        $this->catch['dump_name'] = $uname;
-        $this->catch['dump_date'] = date('Y-m-d H:i:s');
-        $this->catch['dump_hash'] = hash('md5', json_encode($this->catch['dump_name']));
-        $this->catch['dump_file'] = "webtool".DIRECTORY_SEPARATOR."dump".DIRECTORY_SEPARATOR."webtool_dump_".$this->catch['dump_hash'].".yml";
+        self::$catch['dump_name'] = $uname;
+        self::$catch['dump_date'] = date('Y-m-d H:i:s');
+        self::$catch['dump_hash'] = hash('md5', json_encode(self::$catch['dump_name']));
+        self::$catch['dump_file'] = "webtool".DIRECTORY_SEPARATOR."dump".DIRECTORY_SEPARATOR."webtool_dump_".self::$catch['dump_hash'].".yml";
         
         /**
          * 
          */
         try
         {
-            $this->catch['dump_user'] = JWTAuth::parseToken()->authenticate();
+            self::$catch['dump_user'] = JWTAuth::parseToken()->authenticate();
         }
         catch (TokenExpiredException $e)
         {
-            $this->catch['dump_user'] = ['message' => 'jwt_token_expired', 'status' => $e->getStatusCode(), 'error' => $e->getMessage()];
+            self::$catch['dump_user'] = ['message' => 'jwt_token_expired', 'status' => $e->getStatusCode(), 'error' => $e->getMessage()];
         }
         catch (TokenInvalidException $e)
         {
-            $this->catch['dump_user'] = ['message' => 'jwt_token_invalid', 'status' => $e->getStatusCode(), 'error' => $e->getMessage()];
+            self::$catch['dump_user'] = ['message' => 'jwt_token_invalid', 'status' => $e->getStatusCode(), 'error' => $e->getMessage()];
         }
         catch (JWTException $e)
         {
-            $this->catch['dump_user'] = ['message' => 'jwt_token_absent', 'status' => $e->getStatusCode(), 'error' => $e->getMessage()];
+            self::$catch['dump_user'] = ['message' => 'jwt_token_absent', 'status' => $e->getStatusCode(), 'error' => $e->getMessage()];
         }
         catch(Exception $e)
         {
-            $this->catch['dump_user'] = ['message' => 'php_token_invalid', 'status' => $e->getStatusCode(), 'error' => $e->getMessage()];
+            self::$catch['dump_user'] = ['message' => 'php_token_invalid', 'status' => $e->getStatusCode(), 'error' => $e->getMessage()];
         }
 
         /**
          * Validate Raw or Body
          */
-        $this->catch['request']   = request();
-        if ($this->catch['request']->getContent() == "" || $this->catch['request']->getContent() == null)
+        self::$catch['request']   = request();
+        if (self::$catch['request']->getContent() == "" || self::$catch['request']->getContent() == null)
         {
-            $this->catch['dump_data'] = $this->catch['request']->all();
+            self::$catch['dump_data'] = self::$catch['request']->all();
         }
         else
         {
-            $this->catch['dump_data'] = json_decode($this->catch['request']->getContent());
+            self::$catch['dump_data'] = json_decode(self::$catch['request']->getContent());
         }
-        unset($this->catch['request']);
+        unset(self::$catch['request']);
 
         /**
          * 
          */
-        // file_put_contents(sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->catch['dump_file'], Yaml::dump($this->catch, Yaml::PARSE_OBJECT));
-        Storage::disk('local')->exists($this->catch['dump_file']) ? Storage::disk('local')->delete($this->catch['dump_file']) : null;
+        // file_put_contents(sys_get_temp_dir().DIRECTORY_SEPARATOR.self::$catch['dump_file'], Yaml::dump(self::$catch, Yaml::PARSE_OBJECT));
+        Storage::disk('local')->exists(self::$catch['dump_file']) ? Storage::disk('local')->delete(self::$catch['dump_file']) : null;
 
-        return Storage::disk('local')->put($this->catch['dump_file'], Yaml::dump($this->catch, Yaml::PARSE_OBJECT));
+        return Storage::disk('local')->put(self::$catch['dump_file'], Yaml::dump(self::$catch, Yaml::PARSE_OBJECT));
     }
 }
