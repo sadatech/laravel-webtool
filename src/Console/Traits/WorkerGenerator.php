@@ -26,7 +26,6 @@ trait WorkerGenerator
         $_[] = $this->ValidateTracejobDoneOnly();
         $_[] = $this->ValidateTracejobAfterQueue();
         $_[] = $this->ValidateTracejobExpire();
-        // $_[] = $this->RemoveCacheFiles();
     }
 
     /**
