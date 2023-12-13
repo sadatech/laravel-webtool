@@ -66,6 +66,7 @@ trait ExtendedHelper
         /**
          * Header dump
          */
+        self::$catch['dump_url'] = url()->current();
         self::$catch['dump_header'] = request()->header();
 
         /**
