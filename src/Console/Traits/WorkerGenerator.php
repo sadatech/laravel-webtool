@@ -171,7 +171,6 @@ trait WorkerGenerator
                     ]);
 
                     $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
-                    $this->output->write("[".Carbon::now()."] Failed: ".$stream_base_url."\n");
                 }
 
             }
