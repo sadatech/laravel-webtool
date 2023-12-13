@@ -50,6 +50,10 @@ class Webtool_CLI extends Command
         {
             $this->WebtoolJobList();
         }
+        elseif ($_command_name == "reset-dump")
+        {
+            $this->WebtoolResetDump();
+        }
         else
         {
             $this->line("Undefined type commands.");
