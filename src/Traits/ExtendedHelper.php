@@ -22,6 +22,23 @@ trait ExtendedHelper
      */
     public static function CatchRequestData(string $uname, $type = 'json')
     {
+        $enabled = strtolower(Common::GetEnv('DUMP_DATA_DISABLED', 'yes'));
+
+        if ($enabled == "yes")
+        {
+            return ['message' => 'dump_data_disabled', 'status' => 403, 'error' => 'DUMP_DATA_DISABLED'];
+        }
+        else
+        {
+            return self::_CatchRequestData($uname, $type);
+        }
+    }
+
+    /**
+     * 
+     */
+    private static function _CatchRequestData(string $uname, $type = 'json')
+    {
         /**
          * Remove Old Dump
          */
