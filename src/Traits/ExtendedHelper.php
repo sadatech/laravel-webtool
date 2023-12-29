@@ -126,10 +126,17 @@ trait ExtendedHelper
     /**
      * 
      */
-    private static function RemoveOldDump()
+    private static function RemoveOldDump($time = null)
     {
         $files = glob(Storage::disk('local')->path('webtool'.DIRECTORY_SEPARATOR.'dump') . DIRECTORY_SEPARATOR . '*');
-        $threshold = strtotime(Common::GetEnv('DUMP_DATA_EXPIRED', '-3 day'));
+        if ($time == null)
+        {
+            $threshold = strtotime(Common::GetEnv('DUMP_DATA_EXPIRED', '-3 day'));
+        }
+        else
+        {
+            $threshold = strtotime($time);
+        }
 
         foreach ($files as $file)
         {
