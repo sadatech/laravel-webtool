@@ -1,5 +1,5 @@
 <?php
-namespace Sadatech\Webtool\Console;
+namespace Sadatech\Webtool\Http;
 
 trait HttpKernel 
 {
