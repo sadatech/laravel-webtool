@@ -2,6 +2,7 @@
 namespace Sadatech\Webtool\Console;
 
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use SadaTech\Webtool\Console\Commands\WebtoolCommand;
 
 trait Kernel 
 {
@@ -11,7 +12,7 @@ trait Kernel
      * @var array
      */
     protected $commands = [
-        // \Sadatech\Webtool\Console\Commands\Webtool_CLI::class
+        WebtoolCommand::class,
     ];
 
     /**
@@ -20,19 +21,19 @@ trait Kernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule)
-    {
-        // $schedule->command('inspire')
-        //          ->hourly();
-    }
+    // protected function schedule(Schedule $schedule)
+    // {
+    //     // $schedule->command('inspire')
+    //     //          ->hourly();
+    // }
 
     /**
      * Register the commands for the application.
      *
      * @return void
      */
-    protected function commands()
-    {
-        $this->load(__DIR__.'/Commands');
-    }
+    // protected function commands()
+    // {
+    //     $this->load(__DIR__.'/Commands');
+    // }
 }
