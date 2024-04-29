@@ -22,7 +22,6 @@ trait ConsoleKernel
      */
     protected function PackageMapConsole($app)
     {
-        // $app->commands($this->commands);
-        $this->load(__DIR__.'/Commands');
+        $app->commands($this->commands);
     }
 }

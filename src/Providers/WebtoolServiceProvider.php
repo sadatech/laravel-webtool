@@ -26,7 +26,7 @@ class WebtoolServiceProvider extends ServiceProvider
      */
     protected function basepath($location)
     {
-        return realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.$location);
+        return realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.$location);
     }
 
     /**
