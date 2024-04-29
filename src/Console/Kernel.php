@@ -2,7 +2,7 @@
 namespace Sadatech\Webtool\Console;
 
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use SadaTech\Webtool\Console\Commands\WebtoolCommand;
+use Sadatech\Webtool\Console\Commands\WebtoolCommand;
 
 trait Kernel 
 {
@@ -11,7 +11,7 @@ trait Kernel
      *
      * @var array
      */
-    public $commands = [
+    protected $commands = [
         WebtoolCommand::class,
     ];
 
