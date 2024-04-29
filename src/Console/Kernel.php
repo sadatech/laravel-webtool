@@ -32,8 +32,8 @@ trait Kernel
      *
      * @return void
      */
-    // protected function commands()
-    // {
-    //     $this->load(__DIR__.'/Commands');
-    // }
-}
+    protected function PackageMapConsole($app)
+    {
+        $app->commands($this->commands);
+        // $this->load(__DIR__.'/Commands');
+    }
