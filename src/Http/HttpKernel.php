@@ -13,9 +13,9 @@ trait HttpKernel
     protected function PackageMapHttp($app)
     {
         Route::prefix('webtool')
-             ->middleware(['web'])
-             ->namespace($app->namespace_http)
-             ->as('webtool.')
-             ->group($app->basepath('/Http/HttpRoute.php'));
+            ->middleware(['web'])
+            ->namespace($app->namespace_http)
+            ->as('webtool.')
+            ->group($app->basepath('/Http/HttpRoute.php'));
     }
 }
