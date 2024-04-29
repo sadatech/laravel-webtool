@@ -1,7 +1,7 @@
 {
     "name": "sadatech/laravel-webtool",
-    "description": "Common Laravel - Webtool commands",
-    "license": "MIT",
+    "description": "Laravel Worker Command Helper",
+    "license": "private",
     "type": "library",
     "homepage": "https://sada.id",
     "authors": [
