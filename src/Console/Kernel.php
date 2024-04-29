@@ -10,7 +10,7 @@ trait Kernel
      *
      * @var array
      */
-    public $commands = [
+    protected $commands = [
         \Sadatech\Webtool\Console\Commands\Webtool_CLI::class
     ];
 }
