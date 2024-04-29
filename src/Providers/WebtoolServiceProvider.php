@@ -4,8 +4,8 @@ namespace Sadatech\Webtool\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Router;
 use Sadatech\Webtool\Package as WebtoolPackage;
-use Sadatech\Webtool\Console\Kernel as WebtoolConsoleKernel;
-use Sadatech\Webtool\Http\Kernel as WebtoolHttpKernel;
+use Sadatech\Webtool\Console\ConsoleKernel as WebtoolConsoleKernel;
+use Sadatech\Webtool\Http\HttpKernel as WebtoolHttpKernel;
 
 class WebtoolServiceProvider extends ServiceProvider
 {

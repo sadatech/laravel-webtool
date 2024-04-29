@@ -1,9 +1,7 @@
 <?php
 namespace Sadatech\Webtool\Console;
 
-use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-
-trait Kernel 
+trait HttpKernel 
 {
     /**
      * Register the commands for the application.

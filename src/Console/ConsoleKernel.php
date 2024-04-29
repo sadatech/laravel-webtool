@@ -1,11 +1,10 @@
 <?php
 namespace Sadatech\Webtool\Console;
 
-use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Console\Scheduling\Schedule;
 use Sadatech\Webtool\Console\Commands\WebtoolCommand;
 
-trait Kernel 
+trait ConsoleKernel
 {
     /**
      * The Artisan commands provided by your application.
