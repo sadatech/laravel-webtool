@@ -32,7 +32,7 @@ trait ConsoleKernel
      *
      * @return void
      */
-    protected function PackageMapConsole($app, $namespace)
+    protected function PackageMapConsole($app)
     {
         // $app->commands($this->commands);
         $this->schedule();

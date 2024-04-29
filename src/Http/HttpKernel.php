@@ -8,7 +8,7 @@ trait HttpKernel
      *
      * @return void
      */
-    protected function PackageMapHttp($app, $namespace)
+    protected function PackageMapHttp($app)
     {
     }
 }

@@ -38,11 +38,11 @@ class WebtoolServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole())
         {
-            $this->PackageMapConsole($this, $this->namespace);
+            $this->PackageMapConsole($this);
         }
         else
         {
-            $this->PackageMapHttp($this, $this->namespace_http);
+            $this->PackageMapHttp($this);
         }
     }
 }
