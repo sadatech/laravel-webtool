@@ -37,3 +37,4 @@ trait Kernel
         $app->commands($this->commands);
         // $this->load(__DIR__.'/Commands');
     }
+}
