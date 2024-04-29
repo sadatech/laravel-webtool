@@ -32,9 +32,9 @@ trait Kernel
      *
      * @return void
      */
-    protected function PackageMapConsole($app)
+    protected function PackageMapConsole($app, $namespace)
     {
-        $app->commands($this->commands);
-        // $this->load(__DIR__.'/Commands');
+        // $app->commands($this->commands);
+        $this->load(__DIR__.'/Commands');
     }
 }

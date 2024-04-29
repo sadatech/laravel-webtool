@@ -5,10 +5,11 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Router;
 use Sadatech\Webtool\Package as WebtoolPackage;
 use Sadatech\Webtool\Console\Kernel as WebtoolConsoleKernel;
+use Sadatech\Webtool\Http\Kernel as WebtoolHttpKernel;
 
 class WebtoolServiceProvider extends ServiceProvider
 {
-    use WebtoolConsoleKernel;
+    use WebtoolConsoleKernel, WebtoolHttpKernel;
 
     /**
      * This namespace is applied to your controller routes.
@@ -18,6 +19,7 @@ class WebtoolServiceProvider extends ServiceProvider
      * @var string
      */
     protected $namespace = WebtoolPackage::PACKAGE_NAMESPACE;
+    protected $namespace_http = WebtoolPackage::PACKAGE_NAMESPACE.'\Http\Controllers';
 
     /**
      * Define base path for the package
@@ -36,11 +38,11 @@ class WebtoolServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole())
         {
-            $this->PackageMapConsole($this);
+            $this->PackageMapConsole($this, $namespace);
         }
         else
         {
-            $this->webtoolMapRoutes();
+            $this->PackageMapHttp($this, $namespace_http);
         }
     }
 }
