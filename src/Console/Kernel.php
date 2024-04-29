@@ -11,7 +11,7 @@ trait Kernel
      *
      * @var array
      */
-    protected $commands = [
+    public $commands = [
         WebtoolCommand::class,
     ];
 
