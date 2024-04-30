@@ -21,4 +21,9 @@ class WorkerHelper
     {
         return str_replace('https://dataproc.sadata.id/', '/', str_replace(public_path(''), null, str_replace('https://'.request()->getHost().'/', '/', $base_url)));
     }
+
+    public static function GenerateCloudPath($local_path)
+    {
+        return "export-data/".str_replace('//', '/', str_replace('_', '-', CommonHelper::GetConfig("database.connections.mysql.database"))."/".$stream_local_path);
+    }
 }

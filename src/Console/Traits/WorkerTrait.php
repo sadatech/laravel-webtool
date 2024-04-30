@@ -83,15 +83,17 @@ trait WorkerTrait
         {
             // =============== ISOLATED ===============
             $traceCode = hash('sha1', $job_trace->id);
-            $this->buffer['worker_queue'][$traceCode] = $job_trace;
+            $this->buffer['worker_queue_'.$traceCode] = $job_trace;
             // =============== ISOLATED ===============
 
             $this->output->write("[".Carbon::now()."] Processing: Webtool\ConsoleWorkerProcess\n");
 
-            $this->buffer['worker_queue'][$traceCode]['results_url'] = $this->buffer['worker_queue'][$traceCode]->results;
+            $this->buffer['worker_queue'][$traceCode]['results_url'] = $this->buffer['worker_queue_'.$traceCode]->results;
             $this->buffer['worker_queue'][$traceCode]['results_parse_url'] = parse_url($this->buffer['worker_queue'][$traceCode]['results_url']);
-            $this->buffer['worker_queue'][$traceCode]['results_base_url'] = WorkerHelper::ValidateResultBaseURL($this->buffer['worker_queue'][$traceCode], $this->buffer['worker_queue'][$traceCode]['results_parse_url'], $this->buffer['worker_queue'][$traceCode]['results_url']);
-            $this->buffer['worker_queue'][$traceCode]['results_local_path'] = WorkerHelper::GenerateLocalPath($this->buffer['worker_queue'][$traceCode]['results_base_url']);
+            $this->buffer['worker_queue'][$traceCode]['results_parsed_url'] = WorkerHelper::ValidateResultBaseURL($this->buffer['worker_queue'][$traceCode], $this->buffer['worker_queue'][$traceCode]['results_parse_url'], $this->buffer['worker_queue'][$traceCode]['results_url']);
+            $this->buffer['worker_queue'][$traceCode]['results_local_path'] = WorkerHelper::GenerateLocalPath($this->buffer['worker_queue'][$traceCode]['results_parsed_url']);
+            $this->buffer['worker_queue'][$traceCode]['results_cloud_path'] = WorkerHelper::GenerateCloudPath($this->buffer['worker_queue'][$traceCode]['results_local_path']);
+            // $this->buffer['worker_queue'][$traceCode]['results_base_url']
 
             $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
             
