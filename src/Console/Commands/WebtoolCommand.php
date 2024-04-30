@@ -2,9 +2,16 @@
 namespace Sadatech\Webtool\Console\Commands;
 
 use Illuminate\Console\Command;
+use Sadatech\Webtool\Console\Traits\WorkerTrait;
+use Sadatech\Webtool\Console\Traits\JobTrait;
 
 class WebtoolCommand extends Command
 {
+    /**
+     * Use trait
+     */
+    use WorkerTrait, JobTrait;
+
     /**
      * The name and signature of the console command.
      *
@@ -40,7 +47,7 @@ class WebtoolCommand extends Command
 
         if ($cmd_name == 'worker')
         {
-            // 
+            $this->consoleDoWorker();
         }
         elseif ($cmd_name == 'jobs')
         {
