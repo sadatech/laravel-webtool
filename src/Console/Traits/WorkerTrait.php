@@ -75,14 +75,20 @@ trait WorkerTrait
     private function ConsoleWorkerProcess()
     {
         $this->buffer['job_traces'] = JobTrace::whereIn('status', ['DONE'])->whereNotNull('results')->whereNull('url')->orderByDesc('created_at')->get();
+        $this->buffer['worker_queue'] = [];
 
         foreach ($this->buffer['job_traces'] as $job_trace)
         {
-            $traceCode = hash('sha256', $job_trace->id);
-            $this->buffer['jobtrace.'.$traceCode] = $job_trace;
+            $traceCode = hash('sha256', $job_trace->id), $this->buffer['worker_queue'][$traceCode] = $job_trace;
+
             $this->output->write("[".Carbon::now()."] Processing: Webtool\ConsoleWorkerProcess\n");
+
+            $this->buffer['worker_queue'][$traceCode]['results_base_url'] = $this->buffer['worker_queue'][$traceCode]->results;
+            $this->buffer['worker_queue'][$traceCode]['results_parse_url'] = $this->buffer['worker_queue'][$traceCode]->results;
+            
             $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
-            print_r($this->buffer);
+            
         }
+        print_r($this->buffer);
     }
 }
