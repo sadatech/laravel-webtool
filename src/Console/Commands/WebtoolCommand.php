@@ -17,7 +17,7 @@ class WebtoolCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'webtool:cli {cmd_args}';
+    protected $signature = 'webtool:cli {com_name}';
 
     /**
      * The console command description.
