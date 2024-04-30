@@ -3,7 +3,7 @@ namespace Sadatech\Webtool\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Sadatech\Webtool\Application;
+use Sadatech\Webtool\Package;
 
 class ResponseHeader
 {
@@ -18,7 +18,8 @@ class ResponseHeader
     public function handle($request, Closure $next)
     {
         $response = $next($request);
-        $response->header('X-Laravel-Webtool-Version', Application::LARAVEL_WEBTOOL_VERSION);
+        $response->header('X-Laravel-Webtool-Version', Package::PACKAGE_VERSION);
+        $response->header('X-Laravel-Webtool-Namespace', Package::PACKAGE_NAMESPACE);
         $response->header('X-Laravel-Webtool-Dummy', '%%%');
         return $response;
     }
