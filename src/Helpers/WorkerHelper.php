@@ -13,17 +13,17 @@ class WorkerHelper
                 {
                     if ($parse_url['host'] !== @parse_url(CommonHelper::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
                     {
-                        $stream_base_url = str_replace($parse_url['host'], request()->getHost(), $job_trace->results);
+                        return str_replace($parse_url['host'], request()->getHost(), $job_trace->results);
                     }
                 }
                 else
                 {
-                    $stream_base_url = $stream_base_url;
+                    return $base_url;
                 }
             }
             else
             {
-                $stream_base_url = $stream_base_url;
+                return $base_url;
             }
     }
 }
