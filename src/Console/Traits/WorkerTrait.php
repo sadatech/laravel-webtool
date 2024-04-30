@@ -19,33 +19,32 @@ trait WorkerTrait
      */
     public function ConsoleDoWorker()
     {
-        $this->buffer[] = $this->ConsoleDoWorkerArtisan();
-        $this->buffer[] = $this->ConsoleDoWorkerValidate();
+        $this->buffer[] = $this->ConsoleWorkerArtisan();
+        $this->buffer[] = $this->ConsoleWorkerValidate();
+        $this->buffer[] = $this->ConsoleWorkerProcess();
     }
 
     /**
      * Call artisan command by total jobs
      */
-    private function ConsoleDoWorkerArtisan()
+    private function ConsoleWorkerArtisan()
     {
         if (Schema::hasTable('jobs'))
         {
             $job_totals = DB::table('jobs')->whereNull('reserved_at')->count();
-            if ($job_totals > 0) $this->output->write("[".Carbon::now()."] Processing: Webtool\ConsoleDoWorkerArtisan\n");
             if ($job_totals > 0) $this->call("queue:work", ["--once" => null, "--tries" => CommonHelper::GetEnv('WORKER_TRIES', 1), "--timeout" => CommonHelper::GetEnv('WORKER_TIMEOUT', 900), "--memory" => CommonHelper::GetEnv('WORKER_MEMORY', 8192), "--delay" => CommonHelper::GetEnv('WORKER_DELAY', 15), "--sleep" => CommonHelper::GetEnv('WORKER_SLEEP', 5), "--no-ansi" => null, "--no-interaction" => null, "-vvv" => null]);
-            if ($job_totals > 0) $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleDoWorkerArtisan\n");
         }
     }
 
     /**
      * Call validate job traces done only
      */
-    private function ConsoleDoWorkerValidate()
+    private function ConsoleWorkerValidate()
     {
         $this->buffer['job_traces'] = JobTrace::whereIn('status', ['DONE'])->whereNull('results')->whereNull('url')->orderByDesc('created_at')->get();
         foreach ($this->buffer['job_traces'] as $job_trace)
         {
-            $this->output->write("[".Carbon::now()."] Processing: Webtool\ValidateTracejobDoneOnly\n");
+            $this->output->write("[".Carbon::now()."] Processing: Webtool\ConsoleWorkerValidate\n");
             try
             {
                 JobTrace::where('id', $job_trace->id)->first()->update([
@@ -53,10 +52,10 @@ trait WorkerTrait
                     'url'         => NULL,
                     'results'     => NULL,
                     'status'      => 'FAILED',
-                    'log'         => "Failed to generate export file\n(File not found. Please re-run the job again) [CDWV_0x0]",
+                    'log'         => 'Export File not found, please re-run the job again. [ConsoleWorkerValidate::0x0000]',
                 ]);
 
-                $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobDoneOnly\n");
+                $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerValidate\n");
             }
             catch (Exception $exception)
             {
@@ -65,8 +64,25 @@ trait WorkerTrait
                     'log'    => $exception->getMessage(),
                 ]);
 
-                $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobDoneOnly\n");
+                $this->output->write("[".Carbon::now()."] Failed: Webtool\ConsoleWorkerValidate\n");
             }
+        }
+    }
+
+    /**
+     * Call worker to process jobs
+     */
+    private function ConsoleWorkerProcess()
+    {
+        $this->buffer['job_traces'] = JobTrace::whereIn('status', ['DONE'])->whereNotNull('results')->whereNull('url')->orderByDesc('created_at')->get();
+
+        foreach ($this->buffer['job_traces'] as $job_trace)
+        {
+            $traceCode = hash('sha256', $job_trace->id);
+            $this->buffer['jobtrace.'.$traceCode] = $job_trace;
+            $this->output->write("[".Carbon::now()."] Processing: Webtool\ConsoleWorkerProcess\n");
+            $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
+            print_r($this->buffer);
         }
     }
 }
