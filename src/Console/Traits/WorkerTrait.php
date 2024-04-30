@@ -79,7 +79,10 @@ trait WorkerTrait
 
         foreach ($this->buffer['job_traces'] as $job_trace)
         {
-            $traceCode = hash('sha256', $job_trace->id), $this->buffer['worker_queue'][$traceCode] = $job_trace;
+            // =============== ISOLATED ===============
+            $traceCode = hash('sha256', $job_trace->id);
+            $this->buffer['worker_queue'][$traceCode] = $job_trace;
+            // =============== ISOLATED ===============
 
             $this->output->write("[".Carbon::now()."] Processing: Webtool\ConsoleWorkerProcess\n");
 
