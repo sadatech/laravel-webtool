@@ -17,7 +17,7 @@ class WebtoolCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'webtool:cli {com_name}';
+    protected $signature = 'webtool:cli {cmd_name}';
 
     /**
      * The console command description.
@@ -43,7 +43,7 @@ class WebtoolCommand extends Command
      */
     public function handle()
     {
-        $cmd_name = $this->argument('com_name');
+        $cmd_name = $this->argument('cmd_name');
 
         if ($cmd_name == 'worker')
         {
