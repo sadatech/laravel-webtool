@@ -53,7 +53,7 @@ trait WorkerTrait
                     'url'         => NULL,
                     'results'     => NULL,
                     'status'      => 'FAILED',
-                    'log'         => 'Failed to generate export file.',
+                    'log'         => "Failed to generate export file\n(File not found. Please re-run the job again)",
                 ]);
 
                 $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobDoneOnly\n");
