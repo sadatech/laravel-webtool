@@ -24,6 +24,6 @@ class WorkerHelper
 
     public static function GenerateCloudPath($local_path)
     {
-        return "export-data/".str_replace('//', '/', str_replace('_', '-', CommonHelper::GetConfig("database.connections.mysql.database"))."/".$stream_local_path);
+        return "export-data/".str_replace('//', '/', str_replace('_', '-', CommonHelper::GetConfig("database.connections.mysql.database"))."/".$local_path);
     }
 }
