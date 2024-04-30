@@ -95,6 +95,6 @@ trait WorkerTrait
             $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
             
         }
-        print_r($this->buffer);
+        print_r($this->buffer['worker_queue']);
     }
 }
