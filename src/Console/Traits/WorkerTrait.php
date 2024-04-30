@@ -39,6 +39,7 @@ trait WorkerTrait
 
     /**
      * Call validate job traces done only
+     * @error: ConsoleWorkerValidate::0x0000 (Export File not found)
      */
     private function ConsoleWorkerValidate()
     {
