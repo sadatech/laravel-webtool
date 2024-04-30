@@ -11,7 +11,7 @@ trait HttpKernel
     /**
      * This namespace is applied to your controller routes.
      */
-    private $namespace_middleware = ucfirst(WebtoolPackage::PACKAGE_NAMESPACE).'Middleware';
+    private $namespace_middleware;
 
     /**
      * Register middleware for the application.
@@ -30,6 +30,7 @@ trait HttpKernel
      */
     protected function PackageMapHttp($app, Router $router)
     {
+        $this->namespace_middleware = ucfirst(WebtoolPackage::PACKAGE_NAMESPACE).'Middleware';
         $this->PackageMapHttpMiddleware($router);
 
         Route::prefix('webtool')
