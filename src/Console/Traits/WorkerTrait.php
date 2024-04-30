@@ -2,6 +2,7 @@
 namespace Sadatech\Webtool\Console\Traits;
 
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Sadatech\Webtool\Helpers\CommonHelper;
 
 trait WorkerTrait
