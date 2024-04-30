@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/healthcheck', 'HealthcheckController@HttpResponse')->name('healthcheck');
 
 /**
+ * Debug Route List
+ */
+Route::get('/debug/route-list', 'DebugController@DebugRouteList')->name('debug.route_list');
+
+/**
  * Download Generate URL
  */
 // Route::post('/download/generate/{uid?}', 'WebtoolController@downloadGenerate')->name('download.generate');

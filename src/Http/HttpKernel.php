@@ -30,7 +30,10 @@ trait HttpKernel
      */
     protected function PackageMapHttp($app, Router $router)
     {
+        // Set namespace middleware
         $this->namespace_middleware = ucfirst(WebtoolPackage::PACKAGE_NAMESPACE).'Middleware';
+
+        // Register middleware
         $this->PackageMapHttpMiddleware($router);
 
         Route::prefix('webtool')
