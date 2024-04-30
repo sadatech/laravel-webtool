@@ -2,6 +2,7 @@
 namespace Sadatech\Webtool\Http\Controllers;
 
 use Sadatech\Webtool\Http\Controllers\Controller;
+use Sadatech\Webtool\Package as WebtoolPackage;
 
 class HealthcheckController extends Controller
 {
@@ -10,7 +11,8 @@ class HealthcheckController extends Controller
         return response()->json([
             'status' => 'OK',
             'code' => 200,
-            'message' => 'Webtool is running'
+            'message' => ucfirst(WebtoolPackage::PACKAGE_NAME) . ' is running',
+            'namespace' => WebtoolPackage::PACKAGE_NAMESPACE,
         ]);
     }
 }
