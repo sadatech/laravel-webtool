@@ -1,4 +1,6 @@
 <?php
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Webtool Routes
@@ -11,9 +13,9 @@
 /**
  * Healthcheck URL
  */
-Route::get('/healthcheck', 'WebtoolController@healthcheckResponse')->name('healthcheck');
+Route::get('/healthcheck', 'HealthcheckController@HttpResponse')->name('healthcheck');
 
 /**
  * Download Generate URL
  */
-Route::post('/download/generate/{uid?}', 'WebtoolController@downloadGenerate')->name('download.generate');
+// Route::post('/download/generate/{uid?}', 'WebtoolController@downloadGenerate')->name('download.generate');
