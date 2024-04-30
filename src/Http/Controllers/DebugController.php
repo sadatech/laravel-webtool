@@ -8,6 +8,6 @@ class DebugController extends Controller
 {
     public function DebugRouteList()
     {
-        return response()->json(Artisan::class('route:list', ['-vvv']));
+        return response()->json(Artisan::class('route:list', ['-vvv' => null]));
     }
 }
