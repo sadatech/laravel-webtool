@@ -42,7 +42,8 @@ class WebtoolServiceProvider extends ServiceProvider
         }
         else
         {
-            $this->PackageMapHttp($this);
+            $this->loadViewsFrom($this->basepath('resources/views'), $this->namespace_http);
+            $this->PackageMapHttp($this, $router);
         }
     }
 }
