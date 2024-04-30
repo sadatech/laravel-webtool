@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Sadatech\Webtool\Helpers\CommonHelper;
+use Sadatech\Webtool\Helpers\WorkerHelper;
 use App\JobTrace;
 
 trait WorkerTrait
@@ -80,15 +81,16 @@ trait WorkerTrait
         foreach ($this->buffer['job_traces'] as $job_trace)
         {
             // =============== ISOLATED ===============
-            $traceCode = hash('sha256', $job_trace->id);
+            $traceCode = hash('sha1', $job_trace->id);
             $this->buffer['worker_queue'][$traceCode] = $job_trace;
             // =============== ISOLATED ===============
 
             $this->output->write("[".Carbon::now()."] Processing: Webtool\ConsoleWorkerProcess\n");
 
-            $this->buffer['worker_queue'][$traceCode]['results_base_url'] = $this->buffer['worker_queue'][$traceCode]->results;
+            $this->buffer['worker_queue'][$traceCode]['results_url'] = $this->buffer['worker_queue'][$traceCode]->results;
             $this->buffer['worker_queue'][$traceCode]['results_parse_url'] = parse_url($this->buffer['worker_queue'][$traceCode]['results_base_url']);
-            
+            $this->buffer['worker_queue'][$traceCode]['results_base_url'] = WorkerHelper::ValidateResultBaseURL($this->buffer['worker_queue'][$traceCode], $this->buffer['worker_queue'][$traceCode]['results_parse_url'], $this->buffer['worker_queue'][$traceCode]['results_url']);
+
             $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
             
         }
