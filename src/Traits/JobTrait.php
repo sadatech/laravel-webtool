@@ -11,7 +11,9 @@ trait JobTrait
         $http_scheme = strtoupper($scheme);
         $http_endpoint = CommonHelper::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id').'/'.$endpoint;
         $http_build_query = $build_query;
-        $http_client = new HTTP_Client;
+        $http_client = new HTTP_Client(['defaults' => [
+            'verify' => false
+        ], 'verify' => false]);
 
         $http_response = $http_client->request($http_scheme, $http_endpoint, ['form_params' => $http_build_query]);
 
