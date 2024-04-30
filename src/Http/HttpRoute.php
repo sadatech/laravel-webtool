@@ -18,9 +18,9 @@ Route::get('/healthcheck', 'HealthcheckController@HttpResponse')->name('healthch
 /**
  * Debug Route List
  */
-Route::get('/debug/route-list', 'DebugController@DebugRouteList')->name('debug.route_list');
+Route::group(['prefix' => 'debug', 'as' => 'debug.'], function(){});
 
 /**
  * Download Generate URL
  */
-// Route::post('/download/generate/{uid?}', 'WebtoolController@downloadGenerate')->name('download.generate');
+Route::group(['prefix' => 'download', 'as' => 'download.'], function(){});

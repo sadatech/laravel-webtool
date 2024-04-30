@@ -10,7 +10,7 @@ class WebtoolCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'webtool:cmd {cmd_args}';
+    protected $signature = 'webtool:cli {cmd_args}';
 
     /**
      * The console command description.
@@ -27,5 +27,32 @@ class WebtoolCommand extends Command
     public function __construct()
     {
         parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        $cmd_name = $this->argument('com_name');
+
+        if ($cmd_name == 'worker')
+        {
+            // 
+        }
+        elseif ($cmd_name == 'jobs')
+        {
+            // 
+        }
+        elseif ($cmd_name == 'reset-dump')
+        {
+            // 
+        }
+        else
+        {
+            $this->line("Undefined type commands.");
+        }
     }
 }
