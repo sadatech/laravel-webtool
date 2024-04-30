@@ -47,7 +47,7 @@ class WebtoolCommand extends Command
 
         if ($cmd_name == 'worker')
         {
-            $this->consoleDoWorker();
+            $this->ConsoleDoWorker();
         }
         elseif ($cmd_name == 'jobs')
         {
