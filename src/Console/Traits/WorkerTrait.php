@@ -91,6 +91,7 @@ trait WorkerTrait
             $this->buffer['worker_queue'][$traceCode]['results_url'] = $this->buffer['worker_queue'][$traceCode]->results;
             $this->buffer['worker_queue'][$traceCode]['results_parse_url'] = parse_url($this->buffer['worker_queue'][$traceCode]['results_url']);
             $this->buffer['worker_queue'][$traceCode]['results_base_url'] = WorkerHelper::ValidateResultBaseURL($this->buffer['worker_queue'][$traceCode], $this->buffer['worker_queue'][$traceCode]['results_parse_url'], $this->buffer['worker_queue'][$traceCode]['results_url']);
+            $this->buffer['worker_queue'][$traceCode]['results_local_path'] = WorkerHelper::GenerateLocalPath($this->buffer['worker_queue'][$traceCode]['results_base_url']);
 
             $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
             

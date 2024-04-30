@@ -16,4 +16,9 @@ class WorkerHelper
         }
         return $base_url;
     }
+
+    public static function GenerateLocalPath($base_url)
+    {
+        return str_replace('https://dataproc.sadata.id/', '/', str_replace(public_path(''), null, str_replace('https://'.request()->getHost().'/', '/', $base_url)));
+    }
 }
