@@ -36,14 +36,61 @@ class DownloadController extends Controller
                     try
                     {
                         $this->buffer['download_global_url']  = str_rot13(base64_encode(Storage::disk('spaces')->url($this->buffer['file_path'])));
-                        $this->buffer['download_global_path'] = CommonHelper::FetchGetContent('https://global-mirror.sadata.id', true, false, ['url' => $this->buffer['download_global_url']]);
+                        $this->buffer['download_global_fetch'] = CommonHelper::FetchGetContent('https://global-mirror.sadata.id', true, false, ['url' => $this->buffer['download_global_url']]);
+
+                        if ($this->buffer['download_global_fetch']['http_code'] !== 200)
+                        {
+                            $this->buffer['download_global_scheme'] = parse_url($this->buffer['download_cloud_url']);
+                            if (isset($this->buffer['download_global_scheme']['scheme'])) return redirect()->to($this->buffer['download_cloud_url']);
+                            return response()->json($this->buffer['download_global_fetch']);
+                        }
+                        else
+                        {
+                            $this->buffer['download_global_data'] = json_decode($this->buffer['download_global_fetch']['data']);
+
+                            if (isset($this->buffer['download_global_data']->data->preview_url)) return redirect()->to($this->buffer['download_global_data']->data->preview_url);
+                            return redirect()->to($this->buffer['download_cloud_url']);
+                        }
                     }
                     catch (Exception $exception)
-                    {}
+                    {
+                        return redirect()->to($this->buffer['download_cloud_url']);
+                    }
+                }
+                else
+                {
+                    if (!empty($this->buffer['job_trace']->results))
+                    {
+                        $this->buffer['download_global_url'] = str_rot13(base64_encode(Storage::disk("spaces")->url($this->buffer['job_trace']->results)));
+                        $this->buffer['download_cloud_url']  = $this->buffer['job_trace']->results;
+
+                        try
+                        {
+                            $this->buffer['download_global_fetch'] = CommonHelper::FetchGetContent("https://global-mirror.sadata.id", true, false, ["url" => $this->buffer['download_global_url']]);
+
+                            if ($this->buffer['download_global_fetch']['http_code'] !== 200) return redirect()->to($this->buffer['download_cloud_url']);
+                            else
+                            {
+                                $this->buffer['download_global_data'] = json_decode($this->buffer['download_global_fetch']['data']);
+
+                                if (isset($this->buffer['download_global_data']->data->preview_url)) return redirect()->to($this->buffer['download_global_data']->data->preview_url);
+                                return redirect()->to($this->buffer['download_cloud_url']);
+                            }
+                        }
+                        catch (Exception $ex)
+                        {
+                            return redirect()->to($this->buffer['download_cloud_url']);
+                        }
+                    }
+                    else
+                    {
+                        $this->buffer['job_trace']->update([
+                            'status' => 'DELETED',
+                            'log' => 'File may no longer be available due to an export error or the file has expired.',
+                        ]);
+                    }
                 }
             }
         }
-
-        return response()->json($this->buffer);
     }
 }
