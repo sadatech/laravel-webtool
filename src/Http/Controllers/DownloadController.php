@@ -38,6 +38,8 @@ class DownloadController extends Controller
                         $this->buffer['download_global_url']  = str_rot13(base64_encode(Storage::disk('spaces')->url($this->buffer['file_path'])));
                         $this->buffer['download_global_path'] = CommonHelper::FetchGetContent('https://global-mirror.sadata.id', true, false, ['url' => $this->buffer['download_global_url']]);
                     }
+                    catch (Exception $exception)
+                    {}
                 }
             }
         }
