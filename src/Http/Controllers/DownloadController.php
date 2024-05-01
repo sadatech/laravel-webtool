@@ -19,7 +19,9 @@ class DownloadController extends Controller
         if (isset($this->buffer['pkg']->id))
         {
             $this->buffer['job_trace'] = JobTrace::where('id', $this->buffer['pkg']->id)->first();
-            $this->buffer['file_path'] = explode('/', str_replace(CommonHelper::GetConfig('filesystems.disks.spaces.url'), null, urldecode($this->buffer['job_trace']->url)));
+            $this->buffer['file_path'] = str_replace(CommonHelper::GetConfig('filesystems.disks.spaces.url'), null, urldecode($this->buffer['job_trace']->url));
+            array_shift($this->buffer['file_path']);
+            $this->buffer['file_path'] = explode('/', $this->buffer['file_path']);
         }
 
         dd($this->buffer);
