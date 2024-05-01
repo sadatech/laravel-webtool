@@ -4,6 +4,7 @@ namespace Sadatech\Webtool\Console\Traits;
 use Exception;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Sadatech\Webtool\Helpers\CommonHelper;
 use Sadatech\Webtool\Helpers\WorkerHelper;
@@ -102,7 +103,17 @@ trait WorkerTrait
              */
             try
             {
-                $this->buffer['worker_queue'][$traceCode]['file'] = CommonHelper::FetchGetContent($this->buffer['worker_queue'][$traceCode]['results_base_url'], true, true);
+                $this->buffer['worker_queue'][$traceCode]['file_fetch'] = CommonHelper::FetchGetContent($this->buffer['worker_queue'][$traceCode]['results_base_url'], true, true);
+                if ($this->buffer['worker_queue'][$traceCode]['file_fetch']['http_code'] == 200)
+                {
+                    try
+                    {
+                        // $this->buffer['worker_queue'][$traceCode]['file_store'] = Storage::disk("spaces")->put($this->buffer['worker_queue'][$traceCode]['results_cloud_path'], $this->buffer['worker_queue'][$traceCode]['file_fetch']['data'], pack('H*', base_convert('011100000111010101100010011011000110100101100011', 2, 16)));
+                    }
+                    catch (Exception $exception)
+                    {
+                    }
+                }
             }
             catch (Execption $exception)
             {}
@@ -110,6 +121,6 @@ trait WorkerTrait
             $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
             
         }
-        print_r($this->buffer['worker_queue']);
+        print_r(pack('H*', base_convert('011100000111010101100010011011000110100101100011', 2, 16)));
     }
 }
