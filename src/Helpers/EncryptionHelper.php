@@ -3,7 +3,7 @@ namespace Sadatech\Webtool\Helpers;
 
 use Exception;
 
-class EncryptorHelper
+class EncryptionHelper
 {
     private $local_file_prefix = 'webtool_encryptor_';
     private $local_file_path;

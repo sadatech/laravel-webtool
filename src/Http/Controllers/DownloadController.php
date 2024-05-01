@@ -4,7 +4,7 @@ namespace Sadatech\Webtool\Http\Controllers;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Sadatech\Webtool\Http\Controllers\Controller;
-use Sadatech\Webtool\Helpers\EncryptorHelper;
+use Sadatech\Webtool\Helpers\EncryptionHelper;
 use Sadatech\Webtool\Helpers\CommonHelper;
 use App\JobTrace;
 
@@ -15,7 +15,7 @@ class DownloadController extends Controller
     public function GeneralDownloadCloud($uid)
     {
         $this->buffer['uid'] = $uid;
-        $this->buffer['pkg'] = json_decode((new EncryptorHelper)->Disassemble($this->buffer['uid']));
+        $this->buffer['pkg'] = json_decode((new EncryptionHelper)->Disassemble($this->buffer['uid']));
 
         if (isset($this->buffer['pkg']->id))
         {

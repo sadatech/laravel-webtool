@@ -3,7 +3,7 @@ namespace Sadatech\Webtool\Helpers;
 
 use Exception;
 use Illuminate\Support\Facades\File;
-use Sadatech\Webtool\Helpers\EncryptorHelper;
+use Sadatech\Webtool\Helpers\EncryptionHelper;
 
 class CommonHelper
 {
@@ -20,7 +20,7 @@ class CommonHelper
     public static function GenerateActionLink($item, $path)
     {
         $action['html'] = '';
-        $action['url']  = (new EncryptorHelper)->Make(json_encode(['id' => $item->id, 'location' => $item->url]));
+        $action['url']  = (new EncryptionHelper)->Make(json_encode(['id' => $item->id, 'location' => $item->url]));
 
         // validate if done status
         if ($item->status == "DONE")
