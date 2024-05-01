@@ -96,6 +96,7 @@ trait WorkerTrait
             $this->buffer['worker_queue'][$traceCode]['results_local_path'] = WorkerHelper::GenerateLocalPath($this->buffer['worker_queue'][$traceCode]['results_base_url']);
             $this->buffer['worker_queue'][$traceCode]['results_cloud_path'] = WorkerHelper::GenerateCloudPath($this->buffer['worker_queue'][$traceCode]['results_local_path']);
             $this->buffer['worker_queue'][$traceCode]['results_local_url'] = parse_url($this->buffer['worker_queue'][$traceCode]['results_url']);
+            $this->buffer['worker_queue'][$traceCode]['results_cloud_url'] = str_replace('https://'.CommonHelper::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', CommonHelper::GetConfig('filesystems.disks.spaces.endpoint')), CommonHelper::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($this->buffer['worker_queue'][$traceCode]['results_cloud_path']));
             if (!isset($this->buffer['worker_queue'][$traceCode]['results_local_url']['scheme'])) $this->buffer['worker_queue'][$traceCode]['results_base_url'] = 'http://'.request()->getHost().$stream_local_path;;
 
             /**
@@ -108,10 +109,17 @@ trait WorkerTrait
                 {
                     try
                     {
-                        // $this->buffer['worker_queue'][$traceCode]['file_store'] = Storage::disk("spaces")->put($this->buffer['worker_queue'][$traceCode]['results_cloud_path'], $this->buffer['worker_queue'][$traceCode]['file_fetch']['data'], pack('H*', base_convert('011100000111010101100010011011000110100101100011', 2, 16)));
+                        $this->buffer['worker_queue'][$traceCode]['file_store'] = Storage::disk("spaces")->put($this->buffer['worker_queue'][$traceCode]['results_cloud_path'], $this->buffer['worker_queue'][$traceCode]['file_fetch']['data'], pack('H*', base_convert('011100000111010101100010011011000110100101100011', 2, 16)));
                     }
                     catch (Exception $exception)
                     {
+                    }
+
+                    // validate file stored
+                    if ($this->buffer['worker_queue'][$traceCode]['file_store'])
+                    {
+                        if (isset($this->buffer['worker_queue'][$traceCode]['results_local_url']['host']))
+                        {}
                     }
                 }
             }
@@ -121,6 +129,5 @@ trait WorkerTrait
             $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
             
         }
-        print_r(pack('H*', base_convert('011100000111010101100010011011000110100101100011', 2, 16)));
     }
 }
