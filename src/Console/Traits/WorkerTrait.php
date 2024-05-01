@@ -8,10 +8,13 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Sadatech\Webtool\Helpers\CommonHelper;
 use Sadatech\Webtool\Helpers\WorkerHelper;
+use Sadatech\Webtool\Traits\JobTrait;
 use App\JobTrace;
 
 trait WorkerTrait
 {
+    use JobTrait;
+
     /**
      * Define variables
      */
