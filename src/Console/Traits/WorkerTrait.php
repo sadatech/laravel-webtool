@@ -142,13 +142,17 @@ trait WorkerTrait
                         'status'      => 'DONE',
                     ]);
                 }
+
+                $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
             }
             catch (Execption $exception)
-            {}
+            {
+                JobTrace::where('id', $this->buffer['worker_queue_'.$traceCode]->id)->first()->update([
+                    'other_notes' => "Failed to execute `ValidateTracejobAfterQueue` maybe error on `Common::FetchGetContent` or `FileStorage::disk(spaces)->put()` (" . $exception->getMessage() . ") [ConsoleWorkerProcess::0x0000]",
+                ]);
 
-            $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
-            
+                $this->output->write("[".Carbon::now()."] Failed: Webtool\ConsoleWorkerProcess\n");
+            }
         }
-        print_r($this->buffer['worker_queue']);
     }
 }
