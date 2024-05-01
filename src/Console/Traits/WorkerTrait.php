@@ -119,8 +119,25 @@ trait WorkerTrait
                     if ($this->buffer['worker_queue'][$traceCode]['file_store'])
                     {
                         if (isset($this->buffer['worker_queue'][$traceCode]['results_local_url']['host']))
-                        {}
+                        {
+                            if ($this->buffer['worker_queue'][$traceCode]['results_local_url']['host'] == @parse_url(CommonHelper::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
+                            {
+                                $this->MakeRequestNode('POST', 'remove', ['filename' => basename($this->buffer['worker_queue'][$traceCode]['results_cloud_path']), 'hash' => md5($this->buffer['worker_queue'][$traceCode]['results_cloud_path'])]);
+                            }
+                            else
+                            {
+                                if (Storage::disk('local')->exists($this->buffer['worker_queue'][$traceCode]['results_local_path'])) Storage::disk('local')->delete($this->buffer['worker_queue'][$traceCode]['results_local_path']);
+                            }
+                        }
                     }
+
+                    JobTrace::where('id', $this->buffer['worker_queue_'.$traceCode]->id)->first()->update([
+                        'explanation' => NULL,
+                        'log'         => 'Local file deleted & File archived on CDN servers.',
+                        'results'     => NULL,
+                        'url'         => rawurldecode($this->buffer['worker_queue'][$traceCode]['results_cloud_url']),
+                        'status'      => 'DONE',
+                    ]);
                 }
             }
             catch (Execption $exception)
