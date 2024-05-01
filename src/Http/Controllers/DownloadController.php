@@ -31,7 +31,7 @@ class DownloadController extends Controller
                     $this->buffer['download_cloud_name'] = basename($this->buffer['file_path']);
                     $this->buffer['download_cloud_size'] = Storage::disk('spaces')->size($this->buffer['file_path']);
                     $this->buffer['download_cloud_mime'] = Storage::disk('spaces')->mimeType($this->buffer['file_path']);
-                    $this->buffer['download_cloud_url']  = str_replace("https://sadata-cdn.sgp1.digitaloceanspaces.com", CommonHelper::GetConfig('filesystems.disks.spaces.url'), Storage::disk('spaces')->url($this->buffer['file_path']))
+                    $this->buffer['download_cloud_url']  = str_replace("https://sadata-cdn.sgp1.digitaloceanspaces.com", CommonHelper::GetConfig('filesystems.disks.spaces.url'), Storage::disk('spaces')->url($this->buffer['file_path']));
 
                     try
                     {
