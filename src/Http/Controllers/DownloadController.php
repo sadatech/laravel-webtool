@@ -44,6 +44,6 @@ class DownloadController extends Controller
             }
         }
 
-        dd($this->buffer);
+        return response()->json($this->buffer);
     }
 }
