@@ -1,6 +1,8 @@
 <?php
 namespace Sadatech\Webtool\Helpers;
 
+use Exception;
+
 class EncryptorHelper
 {
     private $local_file_prefix = 'webtool_encryptor_';
@@ -38,6 +40,6 @@ class EncryptorHelper
             return $keyData;
         }
         
-        throw new \Exception("Error Processing Request: Failed to Disassemble key, not registered on system.", 1);
+        throw new Exception("Error Processing Request: Failed to Disassemble key, not registered on system.", 1);
     }
 }
