@@ -149,7 +149,7 @@ trait WorkerTrait
             catch (Execption $exception)
             {
                 JobTrace::where('id', $this->buffer['worker_queue_'.$traceCode]->id)->first()->update([
-                    'other_notes' => "Failed to execute `ValidateTracejobAfterQueue` maybe error on `Common::FetchGetContent` or `FileStorage::disk(spaces)->put()` (" . $exception->getMessage() . ") [ConsoleWorkerProcess::0x0000]",
+                    'other_notes' => "Failed to execute `ValidateTracejobAfterQueue` maybe error on `CommonHelper::FetchGetContent` or `FileStorage::disk(spaces)->put()` (" . $exception->getMessage() . ") [ConsoleWorkerProcess::0x0000]",
                 ]);
 
                 $this->output->write("[".Carbon::now()."] Failed: Webtool\ConsoleWorkerProcess\n");
@@ -172,7 +172,7 @@ trait WorkerTrait
             // =============== ISOLATED ===============
 
             $stream_date_now  = Carbon::now()->timestamp;
-            $stream_date_file = Carbon::parse($this->buffer['worker_queue_'.$traceCode]->created_at)->addDays(Common::GetEnv('EXPORT_EXPIRED_DAYS', 3))->timestamp;
+            $stream_date_file = Carbon::parse($this->buffer['worker_queue_'.$traceCode]->created_at)->addDays(CommonHelper::GetEnv('EXPORT_EXPIRED_DAYS', 3))->timestamp;
 
             try
             {
@@ -183,7 +183,7 @@ trait WorkerTrait
                     $this->buffer['worker_queue'][$traceCode]['file_url']           = urldecode($this->buffer['worker_queue_'.$traceCode]->url);
                     $this->buffer['worker_queue'][$traceCode]['file_parse_url']     = parse_url($this->buffer['worker_queue_'.$traceCode]->url);
                     $this->buffer['worker_queue'][$traceCode]['results_cloud_path'] = str_replace($this->buffer['worker_queue'][$traceCode]['file_parse_url']['scheme'].'://'.$this->buffer['worker_queue'][$traceCode]['file_parse_url']['host'].'/', '/', $this->buffer['worker_queue'][$traceCode]['file_url']);
-                    $this->buffer['worker_queue'][$traceCode]['results_local_path'] = str_replace('/export-data/'.str_replace('_', '-', Common::GetConfig('database.connections.mysql.database')), '', $this->buffer['worker_queue'][$traceCode]['results_cloud_path']);
+                    $this->buffer['worker_queue'][$traceCode]['results_local_path'] = str_replace('/export-data/'.str_replace('_', '-', CommonHelper::GetConfig('database.connections.mysql.database')), '', $this->buffer['worker_queue'][$traceCode]['results_cloud_path']);
 
                     // validate exists file
                     if (FileStorage::disk('spaces')->exists($this->buffer['worker_queue'][$traceCode]['results_cloud_path'])) FileStorage::disk('spaces')->delete($this->buffer['worker_queue'][$traceCode]['results_cloud_path']);
