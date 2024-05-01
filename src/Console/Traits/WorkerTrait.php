@@ -1,6 +1,7 @@
 <?php
 namespace Sadatech\Webtool\Console\Traits;
 
+use Exception;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -95,6 +96,16 @@ trait WorkerTrait
             $this->buffer['worker_queue'][$traceCode]['results_cloud_path'] = WorkerHelper::GenerateCloudPath($this->buffer['worker_queue'][$traceCode]['results_local_path']);
             $this->buffer['worker_queue'][$traceCode]['results_local_url'] = parse_url($this->buffer['worker_queue'][$traceCode]['results_url']);
             if (!isset($this->buffer['worker_queue'][$traceCode]['results_local_url']['scheme'])) $this->buffer['worker_queue'][$traceCode]['results_base_url'] = 'http://'.request()->getHost().$stream_local_path;;
+
+            /**
+             * 
+             */
+            try
+            {
+                $this->buffer['worker_queue'][$traceCode]['file'] = CommonHelper::FetchGetContent($this->buffer['worker_queue'][$traceCode]['results_base_url'], true, true);
+            }
+            catch (Execption $exception)
+            {}
 
             $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerProcess\n");
             
