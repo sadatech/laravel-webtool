@@ -16,7 +16,6 @@ trait WorkerTrait
      * Define variables
      */
     private $buffer = [];
-    private $pubcode = pack('H*', base_convert('011100000111010101100010011011000110100101100011', 2, 16));
 
      /**
      * Do worker process
