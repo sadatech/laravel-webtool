@@ -20,8 +20,9 @@ class DownloadController extends Controller
         {
             $this->buffer['job_trace'] = JobTrace::where('id', $this->buffer['pkg']->id)->first();
             $this->buffer['file_path'] = str_replace(CommonHelper::GetConfig('filesystems.disks.spaces.url'), null, urldecode($this->buffer['job_trace']->url));
-            array_shift($this->buffer['file_path']);
             $this->buffer['file_path'] = explode('/', $this->buffer['file_path']);
+            array_shift($this->buffer['file_path']);
+            $this->buffer['file_path'] = trim(implode('/', $this->buffer['file_path']));
         }
 
         dd($this->buffer);
