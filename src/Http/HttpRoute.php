@@ -23,4 +23,6 @@ Route::group(['prefix' => 'debug', 'as' => 'debug.'], function(){});
 /**
  * Download Generate URL
  */
-Route::group(['prefix' => 'download', 'as' => 'download.'], function(){});
+Route::group(['prefix' => 'download', 'as' => 'download.'], function(){
+    Route::post('generate/{uid?}', 'DownloadController@GeneralDownloadCloud')->name('generate');
+});
