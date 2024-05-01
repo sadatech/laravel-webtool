@@ -24,7 +24,7 @@ class DownloadController extends Controller
             array_shift($this->buffer['file_path']);
             $this->buffer['file_path'] = trim(implode('/', $this->buffer['file_path']));
 
-            if (empty($this->buffer['job_trace']))
+            if (isset($this->buffer['job_trace']->id))
             {
                 if (Storage::disk('spaces')->exists($this->buffer['file_path']))
                 {
