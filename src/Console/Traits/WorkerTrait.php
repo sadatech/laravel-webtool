@@ -28,6 +28,7 @@ trait WorkerTrait
         $this->buffer[] = $this->ConsoleWorkerArtisan();
         $this->buffer[] = $this->ConsoleWorkerValidate();
         $this->buffer[] = $this->ConsoleWorkerProcess();
+        $this->buffer[] = $this->ConsoleWorkerClean();
     }
 
     /**
@@ -100,7 +101,7 @@ trait WorkerTrait
             $this->buffer['worker_queue'][$traceCode]['results_cloud_path'] = WorkerHelper::GenerateCloudPath($this->buffer['worker_queue'][$traceCode]['results_local_path']);
             $this->buffer['worker_queue'][$traceCode]['results_local_url'] = parse_url($this->buffer['worker_queue'][$traceCode]['results_url']);
             $this->buffer['worker_queue'][$traceCode]['results_cloud_url'] = str_replace('https://'.CommonHelper::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', CommonHelper::GetConfig('filesystems.disks.spaces.endpoint')), CommonHelper::GetConfig('filesystems.disks.spaces.url'), Storage::disk("spaces")->url($this->buffer['worker_queue'][$traceCode]['results_cloud_path']));
-            if (!isset($this->buffer['worker_queue'][$traceCode]['results_local_url']['scheme'])) $this->buffer['worker_queue'][$traceCode]['results_base_url'] = 'http://'.request()->getHost().$stream_local_path;;
+            if (!isset($this->buffer['worker_queue'][$traceCode]['results_local_url']['scheme'])) $this->buffer['worker_queue'][$traceCode]['results_base_url'] = 'http://'.request()->getHost().$this->buffer['worker_queue'][$traceCode]['results_local_path'];
 
             /**
              * 
@@ -152,6 +153,57 @@ trait WorkerTrait
                 ]);
 
                 $this->output->write("[".Carbon::now()."] Failed: Webtool\ConsoleWorkerProcess\n");
+            }
+        }
+    }
+
+    /**
+     * Call worker to clean expired jobs
+     */
+    private function ConsoleWorkerClean()
+    {
+        $this->buffer['job_traces'] = JobTrace::whereIn('status', ['DONE'])->whereNull('results')->whereNotNull('url')->orderByDesc('created_at')->get();
+
+        foreach ($this->buffer['job_traces'] as $job_trace)
+        {
+            // =============== ISOLATED ===============
+            $traceCode = hash('sha1', $job_trace->id);
+            $this->buffer['worker_queue_'.$traceCode] = $job_trace;
+            // =============== ISOLATED ===============
+
+            $stream_date_now  = Carbon::now()->timestamp;
+            $stream_date_file = Carbon::parse($this->buffer['worker_queue_'.$traceCode]->created_at)->addDays(Common::GetEnv('EXPORT_EXPIRED_DAYS', 3))->timestamp;
+
+            try
+            {
+                if ($stream_date_file < $stream_date_now)
+                {
+                    $this->output->write("[".Carbon::now()."] Processing: Webtool\ConsoleWorkerClean\n");
+
+                    $this->buffer['worker_queue'][$traceCode]['file_url']           = urldecode($this->buffer['worker_queue_'.$traceCode]->url);
+                    $this->buffer['worker_queue'][$traceCode]['file_parse_url']     = parse_url($this->buffer['worker_queue_'.$traceCode]->url);
+                    $this->buffer['worker_queue'][$traceCode]['results_cloud_path'] = str_replace($this->buffer['worker_queue'][$traceCode]['file_parse_url']['scheme'].'://'.$this->buffer['worker_queue'][$traceCode]['file_parse_url']['host'].'/', '/', $this->buffer['worker_queue'][$traceCode]['file_url']);
+                    $this->buffer['worker_queue'][$traceCode]['results_local_path'] = str_replace('/export-data/'.str_replace('_', '-', Common::GetConfig('database.connections.mysql.database')), '', $this->buffer['worker_queue'][$traceCode]['results_cloud_path']);
+
+                    // validate exists file
+                    if (FileStorage::disk('spaces')->exists($this->buffer['worker_queue'][$traceCode]['results_cloud_path'])) FileStorage::disk('spaces')->delete($this->buffer['worker_queue'][$traceCode]['results_cloud_path']);
+                    if (File::exists(public_path($this->buffer['worker_queue'][$traceCode]['results_local_path']))) File::delete(public_path($this->buffer['worker_queue'][$traceCode]['results_local_path']));
+
+                    JobTrace::where('id', $this->buffer['worker_queue_'.$traceCode]->id)->first()->update([
+                        'status' => 'DELETED',
+                        'log'    => 'File may no longer be available due file has expired.',
+                    ]);
+
+                    $this->output->write("[".Carbon::now()."] Processed: Webtool\ConsoleWorkerClean\n");
+                }
+            }
+            catch (Exception $exception)
+            {
+                JobTrace::where('id', $this->buffer['worker_queue_'.$traceCode]->id)->first()->update([
+                    'log' => $exception->getMessage(),
+                ]);
+
+                $this->output->write("[".Carbon::now()."] Failed: Webtool\ConsoleWorkerClean\n");
             }
         }
     }
