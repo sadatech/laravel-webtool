@@ -11,7 +11,10 @@
         }
     ],
     "require": {
-        "php": ">=7.1"
+        "php": ">=7.1",
+        "laravel/framework": "5.4.*",
+        "guzzlehttp/guzzle": "^6",
+        "league/flysystem-aws-s3-v3": "^1.0"
     },
     "autoload": {
         "psr-4": {
@@ -19,5 +22,10 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "discard-changes": true
+    }
 }
