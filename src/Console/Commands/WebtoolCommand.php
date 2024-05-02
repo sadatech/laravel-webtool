@@ -51,11 +51,7 @@ class WebtoolCommand extends Command
         }
         elseif ($cmd_name == 'jobs')
         {
-            // 
-        }
-        elseif ($cmd_name == 'reset-dump')
-        {
-            // 
+            $this->ConsoleJobList();
         }
         else
         {
