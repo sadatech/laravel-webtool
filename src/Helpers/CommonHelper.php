@@ -20,7 +20,7 @@ class CommonHelper
     public static function GenerateActionLink($item, $path)
     {
         $action['html'] = '';
-        $action['url']  = (new EncryptionHelper)->Make(json_encode(['id' => $item->id, 'location' => $item->url]));
+        $action['pkg']  = (new EncryptionHelper)->Make(json_encode(['id' => $item->id, 'location' => $item->url]));
 
         // validate if done status
         if ($item->status == "DONE")
@@ -48,7 +48,7 @@ class CommonHelper
             else
             {
                 $action['html'] .= "
-                <form method='post' action='".route('webtool.download.generate', $action['url'])."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
+                <form method='post' action='".route('webtool.download.generate', $action['pkg'])."?reqid=".hash('sha256', $action['pkg'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
                     <button type='submit' style='width: 80%;' class='btn btn-sm btn-success btn-square' formtarget='_blank'><i class='fa fa-cloud-download'></i></button>
                 </form>
                 ";
