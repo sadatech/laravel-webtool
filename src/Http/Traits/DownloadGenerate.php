@@ -67,7 +67,6 @@ trait DownloadGenerate
                         // $cloud_url_real   = str_replace("https://sadata-cdn.sgp1.digitaloceanspaces.com", Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($download['path']));
                         $cloud_url_real   = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($download['path']));
 
-
                         try
                         {
                             $send_global_data = Common::FetchGetContent("https://global-mirror.sadata.id", true, false, ["url" => $send_global_url]);
