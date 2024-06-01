@@ -23,9 +23,11 @@ trait DownloadGenerate
         {
             $download['trace'] = JobTrace::whereId($download['pkg']->id)->first();
             $download['path'] = str_replace(Common::GetConfig('filesystems.disks.spaces.url'), null, urldecode($download['trace']->url));
+            $download['path'] = str_replace(Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), null, $download['path']);
             $download['path'] = explode('/', $download['path']);
             array_shift($download['path']);
             $download['path'] = trim(implode('/', $download['path']));
+            $download['path'] = str_replace('//', '/', $download['path']);
     
             // validate url not empty
             if (!empty($download['trace']->url))
