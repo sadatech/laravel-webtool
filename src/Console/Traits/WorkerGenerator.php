@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Storage as FileStorage;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Sadatech\Webtool\Traits\ExtendedJob;
+use League\Flysystem\Filesystem;
+use League\Flysystem\MountManager;
+use League\Flysystem\Adapter\Local as AdapterLocal;
 
 trait WorkerGenerator
 {
@@ -127,11 +130,28 @@ trait WorkerGenerator
 
             try
             {
+                $tmpfilename = storage_path().DIRECTORY_SEPARATOR.rand(0, time());
                 $stream_export_file = Common::FetchGetContent($stream_base_url, true, true);
-
+                
                 if ($stream_export_file['http_code'] == 200)
                 {
-                    if (FileStorage::disk("spaces")->put($stream_cloud_path, $stream_export_file['data'], "public"))
+                    try
+                    {
+                        file_put_contents($tmpfilename, $stream_export_file);
+                        $mountManager = new MountManager([
+                            's3' => FileStorage::disk('spaces')->getDriver(),
+                            'local' => new Filesystem(new AdapterLocal(storage_path())),
+                        ]);
+                        $mountManager->copy('local://' . basename($tmpfilename), 's3://' . $stream_cloud_path);
+                        unlink($tmpfilename);
+                    }
+                    catch (\Exception $except)
+                    {
+                        unlink($tmpfilename);
+                        throw new \Error($except);
+                    }
+
+                    if (FileStorage::disk('spaces')->setVisibility($stream_cloud_path, 'public'))
                     {
                         $stream_cloud_url = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($stream_cloud_path));
                         $stream_cloud_url = str_replace('https://'.str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($stream_cloud_path));
