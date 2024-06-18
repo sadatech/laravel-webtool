@@ -137,7 +137,7 @@ trait WorkerGenerator
                 {
                     try
                     {
-                        file_put_contents($tmpfilename, $stream_export_file);
+                        file_put_contents($tmpfilename, $stream_export_file['data']);
                         $mountManager = new MountManager([
                             's3' => FileStorage::disk('spaces')->getDriver(),
                             'local' => new Filesystem(new AdapterLocal(storage_path())),
