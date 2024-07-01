@@ -142,7 +142,7 @@ trait WorkerGenerator
                             's3' => FileStorage::disk('spaces')->getDriver(),
                             'local' => new Filesystem(new AdapterLocal(storage_path())),
                         ]);
-                        $mountManager->copy('local://' . basename($tmpfilename), 's3://' . $stream_cloud_path);
+                        if (!FileStorage::disk('spaces')->exists($stream_cloud_path)) $mountManager->copy('local://' . basename($tmpfilename), 's3://' . $stream_cloud_path);
                         unlink($tmpfilename);
                     }
                     catch (\Exception $except)
