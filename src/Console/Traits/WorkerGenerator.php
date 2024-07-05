@@ -185,9 +185,8 @@ trait WorkerGenerator
                 else
                 {
                     JobTrace::where('id', $job_trace->id)->first()->update([
-                        'status'      => 'FAILED',
-                        'other_notes' => "Worker `stream_export_file` return error (" . $stream_export_file['message'] . ")",
-                        'log'         => 'Failed to fetch exported data from worker.',
+                        'status'  => 'FAILED',
+                        'log'     => "Worker `stream_export_file` return error (" . $stream_export_file['message'] . ") maybe error on `Common::FetchGetContent(".$stream_base_url.")` or `FileStorage::disk(spaces)->put()`",
                     ]);
 
                     $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
@@ -197,7 +196,7 @@ trait WorkerGenerator
             catch (Exeception $exception)
             {
                 JobTrace::where('id', $job_trace->id)->first()->update([
-                    'other_notes' => "Failed to execute `ValidateTracejobAfterQueue` maybe error on `Common::FetchGetContent` or `FileStorage::disk(spaces)->put()` (" . $exception->getMessage() . ")",
+                    'log' => "Failed to execute `ValidateTracejobAfterQueue` maybe error on `Common::FetchGetContent` or `FileStorage::disk(spaces)->put()` (" . $exception->getMessage() . ")",
                 ]);
 
                 $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
