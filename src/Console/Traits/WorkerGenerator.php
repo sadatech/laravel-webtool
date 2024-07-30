@@ -191,12 +191,19 @@ trait WorkerGenerator
                 }
                 else
                 {
+                    // JobTrace::where('id', $job_trace->id)->first()->update([
+                    //     'status'  => 'FAILED',
+                    //     'log'     => "Worker `stream_export_file` return error (" . $stream_export_file['message'] . ") maybe error on `Common::FetchGetContent(".$stream_base_url.")` or `FileStorage::disk(spaces)->put()`",
+                    // ]);
+
                     JobTrace::where('id', $job_trace->id)->first()->update([
-                        'status'  => 'FAILED',
-                        'log'     => "Worker `stream_export_file` return error (" . $stream_export_file['message'] . ") maybe error on `Common::FetchGetContent(".$stream_base_url.")` or `FileStorage::disk(spaces)->put()`",
+                        'explanation' => NULL,
+                        'log'         => 'File not saved on CDN but link generated automatically.',
+                        'url'         => rawurldecode($job_trace->results),
+                        'status'      => 'DONE',
                     ]);
 
-                    $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
+                    $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue\n");
                 }
 
             }
