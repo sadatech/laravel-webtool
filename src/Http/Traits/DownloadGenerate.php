@@ -71,7 +71,7 @@ trait DownloadGenerate
 
                         try
                         {
-                            $send_global_data = Common::FetchGetContent(Common::GetEnv('MIRROR_URL', "https://global-mirror.sadata.id"), true, false, ["url" => $send_global_url]);
+                            $send_global_data = Common::FetchGetContent(Common::GetEnv('MIRROR_URL', "https://dl-trx-cf.sadata.id"), true, false, ["url" => $send_global_url]);
 
                             if ($send_global_data['http_code'] !== 200)
                             {
@@ -114,7 +114,7 @@ trait DownloadGenerate
 
                             try
                             {
-                                $send_global_data = Common::FetchGetContent(Common::GetEnv('MIRROR_URL', "https://global-mirror.sadata.id"), true, false, ["url" => $send_global_url]);
+                                $send_global_data = Common::FetchGetContent(Common::GetEnv('MIRROR_URL', "https://dl-trx-cf.sadata.id"), true, false, ["url" => $send_global_url]);
 
                                 if ($send_global_data['http_code'] !== 200)
                                 {
