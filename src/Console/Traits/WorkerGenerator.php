@@ -29,6 +29,22 @@ trait WorkerGenerator
         $_[] = $this->ValidateTracejobDoneOnly();
         $_[] = $this->ValidateTracejobAfterQueue();
         $_[] = $this->ValidateTracejobExpire();
+        $_[] = $this->KillSleepProcess();
+    }
+
+    /**
+     * Call db statement kill sleeping process
+     */
+    private function KillSleepProcess()
+    {
+        $process_lists = DB::getSchemaBuilder()->getConnection()->select("SHOW FULL PROCESSLIST");
+        foreach ($process_lists as $process_list)
+        {
+            if ($process_list->Time > 30 && $process_list->Command == "Sleep")
+            {
+                DB::getSchemaBuilder()->getConnection()->select("KILL {$process_list->Id}");
+            }
+        }
     }
 
     /**
