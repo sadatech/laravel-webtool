@@ -170,7 +170,14 @@ trait WorkerGenerator
                     }
                     catch (\Exception $except)
                     {
-                        unlink($tmpfilename);
+                        if (File::exists($tmpfilename)) unlink($tmpfilename);
+                        JobTrace::where('id', $job_trace->id)->first()->update([
+                            'explanation' => NULL,
+                            'log'         => 'File not saved on CDN but link generated automatically.',
+                            'results'     => NULL,
+                            'url'         => $job_trace->results,
+                            'status'      => 'DONE',
+                        ]);
                         throw new \Error($except);
                     }
 
