@@ -47,11 +47,19 @@ class Common
             }
             else
             {
-                $action['html'] .= "
-                <form method='post' action='".route('webtool.download.generate', $action['url'])."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
-                    <button type='submit' style='width: 80%;' class='btn btn-sm btn-success btn-square' formtarget='_blank'><i class='fa fa-cloud-download'></i></button>
-                </form>
-                ";
+                if (pathinfo($action['url'], PATHINFO_EXTENSION) !== 'zip') {
+                    $action['html'] .= "
+                    <form method='post' action='".route('webtool.download.generate', $action['url'])."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
+                        <button type='submit' style='width: 80%;' class='btn btn-sm btn-success btn-square' formtarget='_blank'><i class='fa fa-cloud-download'></i></button>
+                    </form>
+                    ";
+                } else {
+                    $action['html'] .= "
+                    <form method='get' action='".$action['url']."?reqid=".hash('sha256', $action['url'].time())."'><input type='hidden' name='_token' value='".csrf_token()."'>
+                        <button type='submit' style='width: 80%;' class='btn btn-sm btn-success btn-square' formtarget='_blank'><i class='fa fa-cloud-download'></i></button>
+                    </form>
+                    ";
+                }
             }
         }
         else
