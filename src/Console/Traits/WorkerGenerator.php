@@ -151,92 +151,107 @@ trait WorkerGenerator
                 $stream_base_url = 'http://'.request()->getHost().$stream_local_path;
             }
 
-            try
-            {
-                $tmpfilename = storage_path().DIRECTORY_SEPARATOR.rand(0, time());
-                $stream_export_file = Common::FetchGetContent($stream_base_url, true, true);
-                
-                if ($stream_export_file['http_code'] == 200)
+            /**
+             * Try filter by extension (zip)
+             */
+            if (pathinfo($stream_base_url, PATHINFO_EXTENSION) !== 'zip') {
+                try
                 {
-                    try
+                    $tmpfilename = storage_path().DIRECTORY_SEPARATOR.rand(0, time());
+                    $stream_export_file = Common::FetchGetContent($stream_base_url, true, true);
+                    
+                    if ($stream_export_file['http_code'] == 200)
                     {
-                        file_put_contents($tmpfilename, $stream_export_file['data']);
-                        $mountManager = new MountManager([
-                            's3' => FileStorage::disk('spaces')->getDriver(),
-                            'local' => new Filesystem(new AdapterLocal(storage_path())),
-                        ]);
-                        if (!FileStorage::disk('spaces')->exists($stream_cloud_path)) $mountManager->copy('local://' . basename($tmpfilename), 's3://' . $stream_cloud_path);
-                        unlink($tmpfilename);
+                        try
+                        {
+                            file_put_contents($tmpfilename, $stream_export_file['data']);
+                            $mountManager = new MountManager([
+                                's3' => FileStorage::disk('spaces')->getDriver(),
+                                'local' => new Filesystem(new AdapterLocal(storage_path())),
+                            ]);
+                            if (!FileStorage::disk('spaces')->exists($stream_cloud_path)) $mountManager->copy('local://' . basename($tmpfilename), 's3://' . $stream_cloud_path);
+                            unlink($tmpfilename);
+                        }
+                        catch (\Exception $except)
+                        {
+                            if (File::exists($tmpfilename)) unlink($tmpfilename);
+                            JobTrace::where('id', $job_trace->id)->first()->update([
+                                'explanation' => NULL,
+                                'log'         => 'File not saved on CDN but link generated automatically.',
+                                'results'     => NULL,
+                                'url'         => $job_trace->results,
+                                'status'      => 'DONE',
+                            ]);
+                            throw new \Error($except);
+                        }
+
+                        if (FileStorage::disk('spaces')->setVisibility($stream_cloud_path, 'public'))
+                        {
+                            $stream_cloud_url = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($stream_cloud_path));
+                            $stream_cloud_url = str_replace('https://'.str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($stream_cloud_path));
+
+                            if (isset($stream_local_url['host']))
+                            {
+                                if ($stream_local_url['host'] == @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
+                                {
+                                    $this->MakeRequestNode('POST', 'remove', ['filename' => basename($stream_cloud_path), 'hash' => md5($stream_cloud_path)]);
+                                }
+                                else
+                                {
+                                    if (File::exists(public_path($stream_local_path)))
+                                    {
+                                        File::delete(public_path($stream_local_path));
+                                    }
+                                }
+                            }
+
+                            JobTrace::where('id', $job_trace->id)->first()->update([
+                                'explanation' => NULL,
+                                'log'         => 'Local file deleted & File archived on CDN servers.',
+                                'results'     => NULL,
+                                'url'         => rawurldecode($stream_cloud_url),
+                                'status'      => 'DONE',
+                            ]);
+
+                            $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue\n");
+                        }
                     }
-                    catch (\Exception $except)
+                    else
                     {
-                        if (File::exists($tmpfilename)) unlink($tmpfilename);
+                        // JobTrace::where('id', $job_trace->id)->first()->update([
+                        //     'status'  => 'FAILED',
+                        //     'log'     => "Worker `stream_export_file` return error (" . $stream_export_file['message'] . ") maybe error on `Common::FetchGetContent(".$stream_base_url.")` or `FileStorage::disk(spaces)->put()`",
+                        // ]);
+
                         JobTrace::where('id', $job_trace->id)->first()->update([
                             'explanation' => NULL,
                             'log'         => 'File not saved on CDN but link generated automatically.',
-                            'results'     => NULL,
-                            'url'         => $job_trace->results,
-                            'status'      => 'DONE',
-                        ]);
-                        throw new \Error($except);
-                    }
-
-                    if (FileStorage::disk('spaces')->setVisibility($stream_cloud_path, 'public'))
-                    {
-                        $stream_cloud_url = str_replace('https://'.Common::GetConfig('filesystems.disks.spaces.bucket').str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($stream_cloud_path));
-                        $stream_cloud_url = str_replace('https://'.str_replace('https://', '.', Common::GetConfig('filesystems.disks.spaces.endpoint')), Common::GetConfig('filesystems.disks.spaces.url'), FileStorage::disk("spaces")->url($stream_cloud_path));
-
-                        if (isset($stream_local_url['host']))
-                        {
-                            if ($stream_local_url['host'] == @parse_url(Common::GetEnv('DATAPROC_URL', 'https://dataproc.sadata.id/'))['host'])
-                            {
-                                $this->MakeRequestNode('POST', 'remove', ['filename' => basename($stream_cloud_path), 'hash' => md5($stream_cloud_path)]);
-                            }
-                            else
-                            {
-                                if (File::exists(public_path($stream_local_path)))
-                                {
-                                    File::delete(public_path($stream_local_path));
-                                }
-                            }
-                        }
-
-                        JobTrace::where('id', $job_trace->id)->first()->update([
-                            'explanation' => NULL,
-                            'log'         => 'Local file deleted & File archived on CDN servers.',
-                            'results'     => NULL,
-                            'url'         => rawurldecode($stream_cloud_url),
+                            'url'         => rawurldecode($job_trace->results),
                             'status'      => 'DONE',
                         ]);
 
                         $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue\n");
                     }
-                }
-                else
-                {
-                    // JobTrace::where('id', $job_trace->id)->first()->update([
-                    //     'status'  => 'FAILED',
-                    //     'log'     => "Worker `stream_export_file` return error (" . $stream_export_file['message'] . ") maybe error on `Common::FetchGetContent(".$stream_base_url.")` or `FileStorage::disk(spaces)->put()`",
-                    // ]);
 
+                }
+                catch (Exeception $exception)
+                {
                     JobTrace::where('id', $job_trace->id)->first()->update([
-                        'explanation' => NULL,
-                        'log'         => 'File not saved on CDN but link generated automatically.',
-                        'url'         => rawurldecode($job_trace->results),
-                        'status'      => 'DONE',
+                        'log' => "Failed to execute `ValidateTracejobAfterQueue` maybe error on `Common::FetchGetContent` or `FileStorage::disk(spaces)->put()` (" . $exception->getMessage() . ")",
                     ]);
 
-                    $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue\n");
+                    $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
                 }
 
-            }
-            catch (Exeception $exception)
-            {
+            } else {
                 JobTrace::where('id', $job_trace->id)->first()->update([
-                    'log' => "Failed to execute `ValidateTracejobAfterQueue` maybe error on `Common::FetchGetContent` or `FileStorage::disk(spaces)->put()` (" . $exception->getMessage() . ")",
+                    'explanation' => NULL,
+                    'log'         => 'File not saved on CDN but link generated automatically.',
+                    'results'     => NULL,
+                    'url'         => $stream_base_url,
+                    'status'      => 'DONE',
                 ]);
-
-                $this->output->write("[".Carbon::now()."] Failed: Webtool\ValidateTracejobAfterQueue\n");
+                $this->output->write("[".Carbon::now()."] Processed: Webtool\ValidateTracejobAfterQueue\n");
             }
         }
     }
